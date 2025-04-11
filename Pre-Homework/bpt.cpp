@@ -10,8 +10,12 @@ class Node {
 private:
     int is_leaf;
     int size;
-    T[M] key;
-    long[M] address_of_children;
+    T key[M];
+    long address_of_children[M];
     long address_of_the_right_node;
     
 };
+
+int main() {
+
+}
