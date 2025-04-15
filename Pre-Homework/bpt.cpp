@@ -3,8 +3,8 @@
 #include <fstream>
 #include <vector>
 #include <climits>
-const int M = 1000;
-const int L = 1000;
+const int M = 10;
+const int L = 10;
 
 template<typename T>
 class Node {
@@ -118,9 +118,9 @@ private:
             for (int i = 0; i < new_node.size; i++) {
                 new_node.key[i] = child.key[i + child.size];
             }
-            new_node.write_to_file();
+            new_node.write_to_file(File);
             File.seekp(parent.address_of_children[k]);
-            child.write_to_file();
+            child.write_to_file(File);
         } else {
             new_node.size = child.size / 2;
             child.size = child.size - new_node.size - 1;
@@ -162,11 +162,11 @@ private:
         File.seekg(address);
         Node<T> node;
         node.read_from_file(File);
-        if (node->size > L - 1) {
+        if (node.size > L - 1) {
             return false;
         }
         int index = binary_find(node, value);
-        if (node->is_leaf == 1) {
+        if (node.is_leaf == 1) {
             if (index != -1 && node.key[index] == value) {
                 return false;
             }
@@ -190,7 +190,8 @@ private:
         Node<T> node;
         File.seekg(address_of_root);
         long address = address_of_root;
-        node.read_from_file();
+        node.read_from_file(File);
+        std::cout << node.is_leaf << std::endl;
         while (node.is_leaf == 0) {
             int index = binary_find(node, value);
             File.seekg(node.address_of_children[index + 1]);
@@ -293,7 +294,7 @@ private:
                     right_child.address_of_children[delta] = right_child.address_of_children[0];
                     for (int i = 0; i < delta - 1; i++) {
                         right_child.key[i] = child.key[left_size + i + 1];
-                        right_child.address_of_children[i] = child.address_of_children[left_size + i + 1]
+                        right_child.address_of_children[i] = child.address_of_children[left_size + i + 1];
                     }
                     right_child.key[delta - 1] = parent.key[k];
                     right_child.address_of_children[delta - 1] = child.address_of_children[left_size + delta];
@@ -338,11 +339,11 @@ private:
         File.seekg(address);
         Node<T> node;
         node.read_from_file(File);
-        if (node->size < (L - 1) / 2) {
+        if (node.size < (L - 1) / 2) {
             return false;
         }
         int index = binary_find(node, value);
-        if (node->is_leaf == 1) {
+        if (node.is_leaf == 1) {
             if (index == -1 || node.key[index] != value) {
                 return false;
             }
@@ -381,7 +382,8 @@ public:
         }
         Node<T> initial;
         initial.is_leaf = 1;
-        File.seekp(0);
+        File.seekp(0, std::ios::beg);
+        std::cout << sizeof(Node<T>) << std::endl;
         initial.write_to_file(File);
     }
     bool insert(T value) {
@@ -404,7 +406,7 @@ public:
             int index1 = binary_find(node, minimal);
             int index2 = binary_find(node, maximal);
             for (int i = index1 + 1; i <= index2; i++) {
-                values.push_back(node.key[i])
+                values.push_back(node.key[i]);
             }
             return values;
         } else {
@@ -416,7 +418,7 @@ public:
             int index1 = binary_find(node, minimal);
             int index2 = binary_find(node_, maximal);
             for (int i = index1 + 1; i < node.size; i++) {
-                values.push_back(node.key[i])
+                values.push_back(node.key[i]);
             }
             address = node.address_of_right_node;
             while (address != address_) {
@@ -439,6 +441,7 @@ public:
     char key[65];
     int value;
 public:
+    key_value() : value(INT_MIN) {}
     key_value(char* key_, int value_) : value(value_) {
         for (int i = 0; i < 65; i++) {
             key[i] = key_[i];
@@ -454,6 +457,7 @@ public:
             key[i] = other.key[i];
         }
         value = other.value;
+        return *this;
     }
     bool operator<(const key_value& other) {
         for (int i = 0; i < 65; i++) {
