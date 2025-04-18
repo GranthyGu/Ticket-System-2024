@@ -3,16 +3,16 @@
 #include <fstream>
 #include <vector>
 #include <climits>
-const int M = 180;
-const int L = 20;
+const int M = 3;
+const int L = 3;
 
 template<typename T>
 class Node {
 public:
     int is_leaf;
     int size;
-    T key[M] = {};
-    long address_of_children[M] = {-1};
+    T key[M + 1] = {};
+    long address_of_children[M + 1] = {-1};
     long address_of_parent;
     long address_of_right_node;
     Node() : is_leaf(0), size(0), address_of_right_node(-1), address_of_parent(-1) {}
@@ -37,8 +37,8 @@ public:
         if (!File) {return;}
         File.write(reinterpret_cast<char*> (&is_leaf), sizeof(int));
         File.write(reinterpret_cast<char*> (&size), sizeof(int));
-        File.write(reinterpret_cast<char*> (key), M * sizeof(T));
-        File.write(reinterpret_cast<char*> (address_of_children), M * sizeof(long));
+        File.write(reinterpret_cast<char*> (key), (M + 1)* sizeof(T));
+        File.write(reinterpret_cast<char*> (address_of_children), (M + 1) * sizeof(long));
         File.write(reinterpret_cast<char*> (&address_of_right_node), sizeof(long));
         File.write(reinterpret_cast<char*> (&address_of_parent), sizeof(long));
     }
@@ -46,8 +46,8 @@ public:
         if (!File) {return;}
         File.read(reinterpret_cast<char*> (&is_leaf), sizeof(int));
         File.read(reinterpret_cast<char*> (&size), sizeof(int));
-        File.read(reinterpret_cast<char*> (key), M * sizeof(T));
-        File.read(reinterpret_cast<char*> (address_of_children), M * sizeof(long));
+        File.read(reinterpret_cast<char*> (key), (M + 1) * sizeof(T));
+        File.read(reinterpret_cast<char*> (address_of_children), (M + 1) * sizeof(long));
         File.read(reinterpret_cast<char*> (&address_of_right_node), sizeof(long));
         File.read(reinterpret_cast<char*> (&address_of_parent), sizeof(long));
     }
@@ -73,10 +73,14 @@ private:
         }
         return left - 1;
     }
-    void recall_for_insert(Node<T> parent, long address) {
+    void recall_for_insert(long address) {
+        Node<T> parent;
+        File.seekg(address);
+        parent.read_from_file(File);
         if (parent.address_of_parent == -1) {   // Which means that the parent node is the root.
             Node<T> new_root;
             new_root.address_of_children[0] = address;
+            new_root.address_of_parent = -1;
             File.seekp(0, std::ios::end);
             long root_address = File.tellp();
             new_root.write_to_file(File);
@@ -137,10 +141,10 @@ private:
             child.write_to_file(File);
             for (int i = 0; i <= new_node.size; i++) {
                 File.seekg(new_node.address_of_children[i]);
-                File.seekp(new_node.address_of_children[i]);
                 Node<T> tmp;
                 tmp.read_from_file(File);
                 tmp.address_of_parent = address_last;
+                File.seekp(new_node.address_of_children[i]);
                 tmp.write_to_file(File);
             }
         }
@@ -154,7 +158,7 @@ private:
         File.seekp(address);
         parent.write_to_file(File);
         if (parent.size > M - 1) {
-            recall_for_insert(parent, address);
+            recall_for_insert(address);
         }
         return;
     }
@@ -176,7 +180,7 @@ private:
             File.seekp(address);
             node.write_to_file(File);
             if (node.size >= L) {
-                recall_for_insert(node, address);
+                recall_for_insert(address);
             }
             return true;
         } else {
@@ -553,6 +557,7 @@ int main() {
                 std::cout << std::endl;
             }
         }
+        std::cout << "!!" << std::endl;
     }
     bpt.put_root();
 }
