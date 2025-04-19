@@ -3,8 +3,8 @@
 #include <fstream>
 #include <vector>
 #include <climits>
-const int M = 3;
-const int L = 3;
+const int M = 63;
+const int L = 63;
 
 template<typename T>
 class Node {
@@ -241,10 +241,10 @@ private:
             child.address_of_right_node = right_child.address_of_right_node;\
             for (int i = 0; i <= right_child.size; i++) {
                 File.seekg(right_child.address_of_children[i]);
-                File.seekp(right_child.address_of_children[i]);
                 Node<T> tmp;
                 tmp.read_from_file(File);
                 tmp.address_of_parent = parent.address_of_children[k];
+                File.seekp(right_child.address_of_children[i]);
                 tmp.write_to_file(File);
             }
             for (int i = k; i < parent.size - 1; i++) {
@@ -278,10 +278,10 @@ private:
                     child.address_of_children[left_size] = right_child.address_of_children[left_size - child.size - 1];
                     for (int i = child.size + 1; i <= left_size; i++) {
                         File.seekg(child.address_of_children[i]);
-                        File.seekp(child.address_of_children[i]);
                         Node<T> tmp;
                         tmp.read_from_file(File);
                         tmp.address_of_parent = parent.address_of_children[k];
+                        File.seekp(child.address_of_children[i]);
                         tmp.write_to_file(File);
                     }
                     parent.key[k] = right_child.key[delta - 1];
@@ -317,10 +317,10 @@ private:
                     right_child.address_of_children[delta - 1] = child.address_of_children[left_size + delta];
                     for (int i = 0; i < delta; i++) {
                         File.seekg(right_child.address_of_children[i]);
-                        File.seekp(right_child.address_of_children[i]);
                         Node<T> tmp;
                         tmp.read_from_file(File);
                         tmp.address_of_parent = parent.address_of_children[k + 1];
+                        File.seekp(right_child.address_of_children[i]);
                         tmp.write_to_file(File);
                     }
                     parent.key[k] = child.key[left_size];
@@ -557,7 +557,6 @@ int main() {
                 std::cout << std::endl;
             }
         }
-        std::cout << "!!" << std::endl;
     }
     bpt.put_root();
 }
