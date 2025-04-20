@@ -1,7 +1,7 @@
 #include <iostream>
 #include <string>
 #include <fstream>
-#include "src/vector.hpp"
+#include "vector/vector.hpp"
 
 template<typename T, const int M, const int L>
 class Node {

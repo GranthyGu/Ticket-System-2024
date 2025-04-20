@@ -1,3 +1,5 @@
-*
-!.gitignore
-!README.txt
+# 忽略 build 目录及其所有内容
+build/
+
+# 忽略 testcases 目录及其所有内容
+testcases/
