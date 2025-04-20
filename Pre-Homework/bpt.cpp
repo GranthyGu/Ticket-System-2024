@@ -434,7 +434,9 @@ public:
         if (node.key[index] < minimal) {index++;}
         while (true) {
             while (index < node.size && (node.key[index] < maximal || node.key[index] == maximal)) {
-                values.push_back(node.key[index]);
+                if (node.key[index] > minimal || node.key[index] == minimal) {
+                    values.push_back(node.key[index]);
+                }
                 index++;
             }
             if (node.address_of_right_node == -1 || node.key[node.size - 1] > maximal || node.key[node.size - 1] == maximal) {
