@@ -427,42 +427,24 @@ public:
     sjtu::vector<T> find(T minimal, T maximal) {
         sjtu::vector<T> values;
         long address = find_corresponding_leaf(minimal);
-        long address_ = find_corresponding_leaf(maximal);
-        if (address == address_) {
-            Node<T, M, L> node;
-            File.seekg(address);
+        Node<T, M, L> node;
+        File.seekg(address);
+        node.read_from_file(File);
+        int index = binary_find(node, minimal);
+        if (node.key[index] < minimal) {index++;}
+        while (true) {
+            while (index < node.size && (node.key[index] < maximal || node.key[index] == maximal)) {
+                values.push_back(node.key[index]);
+                index++;
+            }
+            if (node.address_of_right_node == -1 || node.key[node.size - 1] > maximal || node.key[node.size - 1] == maximal) {
+                break;
+            }
+            File.seekg(node.address_of_right_node);
             node.read_from_file(File);
-            int index1 = binary_find(node, minimal);
-            int index2 = binary_find(node, maximal);
-            for (int i = index1 + 1; i <= index2; i++) {
-                values.push_back(node.key[i]);
-            }
-            return values;
-        } else {
-            Node<T, M, L> node, node_;
-            File.seekg(address);
-            node.read_from_file(File);
-            File.seekg(address_);
-            node_.read_from_file(File);
-            int index1 = binary_find(node, minimal);
-            int index2 = binary_find(node_, maximal);
-            for (int i = index1 + 1; i < node.size; i++) {
-                values.push_back(node.key[i]);
-            }
-            address = node.address_of_right_node;
-            while (address != address_) {
-                File.seekg(address);
-                node.read_from_file(File);
-                for (int i = 0; i < node.size; i++) {
-                    values.push_back(node.key[i]);
-                }
-                address = node.address_of_right_node;
-            }
-            for (int i = 0; i <= index2; i++) {
-                values.push_back(node_.key[i]);
-            }
-            return values;
+            index = 0;
         }
+        return values;
     }
     void put_root() {
         File.seekp(0, std::ios::end);
@@ -521,7 +503,7 @@ public:
 int main() {
     int n;
     std::cin >> n;
-    B_plus_tree<key_value, 53, 53> bpt("File_for_bpt");
+    B_plus_tree<key_value, 3, 3> bpt("File_for_bpt");
     for (int i = 0; i < n; i++) {
         std::string operation;
         std::cin >> operation;
