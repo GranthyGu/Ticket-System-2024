@@ -430,10 +430,10 @@ public:
         Node<T, M, L> node;
         File.seekg(address);
         node.read_from_file(File);
-        int index = binary_find(node, minimal);
-        if (node.key[index] < minimal) {index++;}
+        int index = 0;
+        while (index < node.size && node.key[index] < minimal) {index++;}
         while (true) {
-            while (index < node.size && node.key[index] < maximal) {
+            while (index < node.size && (node.key[index] < maximal || node.key[index] == maximal)) {
                 values.push_back(node.key[index]);
                 index++;
             }
