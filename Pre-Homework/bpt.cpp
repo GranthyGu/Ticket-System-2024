@@ -160,7 +160,7 @@ private:
         return;
     }
     // Insert the certain value to the certain node(found by the address of itself).
-    bool insert_to_bpt(long address, T value) {
+    bool insert_to_bpt(long address, const T& value) {
         File.seekg(address);
         Node<T, M, L> node;
         node.read_from_file(File);
@@ -185,7 +185,7 @@ private:
         }
     }
     // For certain T, find its corresponding leaf. Begin the finding from the root, stop at the leaf.
-    long find_corresponding_leaf(T value) {
+    long find_corresponding_leaf(const T& value) {
         Node<T, M, L> node;
         File.seekg(address_of_root);
         long address = address_of_root;
@@ -360,7 +360,7 @@ private:
             return;
         }
     }
-    bool delete_the_node(long address, T value) {
+    bool delete_the_node(long address, const T& value) {
         File.seekg(address);
         Node<T, M, L> node;
         node.read_from_file(File);
@@ -416,15 +416,15 @@ public:
             address_of_root = address_before;
         }
     }
-    bool insert(T value) {
+    bool insert(const T& value) {
         long address = find_corresponding_leaf(value);
         return insert_to_bpt(address, value);
     }
-    bool remove(T value) {
+    bool remove(const T& value) {
         long address = find_corresponding_leaf(value);
         return delete_the_node(address, value);
     }
-    sjtu::vector<T> find(T minimal, T maximal) {
+    sjtu::vector<T> find(const T& minimal, const T& maximal) {
         sjtu::vector<T> values;
         long address = find_corresponding_leaf(minimal);
         Node<T, M, L> node;
@@ -433,11 +433,11 @@ public:
         int index = binary_find(node, minimal);
         if (node.key[index] < minimal) {index++;}
         while (true) {
-            while (index < node.size && (node.key[index] < maximal || node.key[index] == maximal)) {
+            while (index < node.size && node.key[index] < maximal) {
                 values.push_back(node.key[index]);
                 index++;
             }
-            if (node.address_of_right_node == -1 || node.key[node.size - 1] > maximal || node.key[node.size - 1] == maximal) {
+            if (node.address_of_right_node == -1 || node.key[node.size - 1] > maximal) {
                 break;
             }
             File.seekg(node.address_of_right_node);
@@ -503,7 +503,7 @@ public:
 int main() {
     int n;
     std::cin >> n;
-    B_plus_tree<key_value, 53, 53> bpt("File_for_bpt");
+    B_plus_tree<key_value, 3, 3> bpt("File_for_bpt");
     for (int i = 0; i < n; i++) {
         std::string operation;
         std::cin >> operation;
