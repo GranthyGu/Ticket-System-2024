@@ -4,5 +4,5 @@ project(MapListTest)
 set(CMAKE_CXX_STANDARD 17)
 
 add_executable(code
-        Pre-Homework/bpt.cpp
+        Pre-Homework/new_bpt.cpp
 )
