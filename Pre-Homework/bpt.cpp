@@ -14,7 +14,7 @@ public:
     long address_of_right_node;
     Node() : is_leaf(0), size(0), address_of_right_node(-1), address_of_parent(-1) {}
     Node(int leaf, int size, T* key_, long* add, long add_, long add_parent) : is_leaf(leaf), size(size), address_of_right_node(add_), address_of_parent(add_parent) {
-        for (int i = 0; i < M; i++) {
+        for (int i = 0; i <= M; i++) {
             key[i] = key_[i];
             address_of_children[i] = add[i];
         }
@@ -24,7 +24,7 @@ public:
         this->size = other.size;
         this->address_of_right_node = other.address_of_right_node;
         this->address_of_parent = other.address_of_parent;
-        for (int i = 0; i < M; i++) {
+        for (int i = 0; i <= M; i++) {
             this->key[i] = other.key[i];
             this->address_of_children[i] = other.address_of_children[i];
         }

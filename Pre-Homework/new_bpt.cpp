@@ -1,7 +1,8 @@
 #include <iostream>
 #include <string>
 #include <fstream>
-#include "vector/vector.hpp"
+#include <vector>
+#include <climits>
 
 template<typename T, const int M, const int L>
 class Node {
@@ -22,7 +23,7 @@ public:
         this->is_leaf = other.is_leaf;
         this->size = other.size;
         this->address_of_parent = other.address_of_parent;
-        for (int i = 0; i < M; i++) {
+        for (int i = 0; i <= M; i++) {
             this->key[i] = other.key[i];
             this->address_of_children[i] = other.address_of_children[i];
         }
@@ -55,7 +56,7 @@ public:
     long address_of_right_node;
     leaf_Node() : size(0), address_of_right_node(-1), address_of_parent(-1) {}
     leaf_Node(int size, T* key_, V* value_, long* add, long add_, long add_parent) : size(size), address_of_right_node(add_), address_of_parent(add_parent) {
-        for (int i = 0; i < L; i++) {
+        for (int i = 0; i <= L; i++) {
             key[i] = key_[i];
             value[i] = value_[i];
         }
@@ -221,14 +222,15 @@ private:
             File.seekp(parent.address_of_children[k]);
             child.write_to_file(File);
             for (int i = 0; i <= new_node.size; i++) {
-                File.seekg(new_node.address_of_children[i]);
                 if (new_node.is_leaf == 1) {
+                    File.seekg(new_node.address_of_children[i]);
                     leaf_Node<T, V, M, L> tmp;
                     tmp.read_from_file(File);
                     tmp.address_of_parent = address_last;
                     File.seekp(new_node.address_of_children[i]);
                     tmp.write_to_file(File);
                 } else {
+                    File.seekg(new_node.address_of_children[i]);
                     Node<T, M, L> tmp;
                     tmp.read_from_file(File);
                     tmp.address_of_parent = address_last;
@@ -376,14 +378,15 @@ private:
                 child.address_of_children[child.size + right_child.size + 1] = right_child.address_of_children[right_child.size];
                 child.size += right_child.size + 1;
                 for (int i = 0; i <= right_child.size; i++) {
-                    File.seekg(right_child.address_of_children[i]);
                     if (right_child.is_leaf == 1) {
+                        File.seekg(right_child.address_of_children[i]);
                         leaf_Node<T, V, M, L> tmp;
                         tmp.read_from_file(File);
                         tmp.address_of_parent = parent.address_of_children[k];
                         File.seekp(right_child.address_of_children[i]);
                         tmp.write_to_file(File);
                     } else {
+                        File.seekg(right_child.address_of_children[i]);
                         Node<T, M, L> tmp;
                         tmp.read_from_file(File);
                         tmp.address_of_parent = parent.address_of_children[k];
@@ -412,14 +415,15 @@ private:
                     }
                     child.address_of_children[left_size] = right_child.address_of_children[left_size - child.size - 1];
                     for (int i = child.size + 1; i <= left_size; i++) {
-                        File.seekg(child.address_of_children[i]);
                         if (child.is_leaf == 1) {
+                            File.seekg(child.address_of_children[i]);
                             leaf_Node<T, V, M, L> tmp;
                             tmp.read_from_file(File);
                             tmp.address_of_parent = parent.address_of_children[k];
                             File.seekp(child.address_of_children[i]);
                             tmp.write_to_file(File);
                         } else {
+                            File.seekg(child.address_of_children[i]);
                             Node<T, M, L> tmp;
                             tmp.read_from_file(File);
                             tmp.address_of_parent = parent.address_of_children[k];
@@ -447,14 +451,15 @@ private:
                     right_child.key[delta - 1] = parent.key[k];
                     right_child.address_of_children[delta - 1] = child.address_of_children[left_size + delta];
                     for (int i = 0; i < delta; i++) {
-                        File.seekg(right_child.address_of_children[i]);
                         if (right_child.is_leaf == 1) {
+                            File.seekg(right_child.address_of_children[i]);
                             leaf_Node<T, V, M, L> tmp;
                             tmp.read_from_file(File);
                             tmp.address_of_parent = parent.address_of_children[k + 1];
                             File.seekp(right_child.address_of_children[i]);
                             tmp.write_to_file(File);
                         } else {
+                            File.seekg(right_child.address_of_children[i]);
                             Node<T, M, L> tmp;
                             tmp.read_from_file(File);
                             tmp.address_of_parent = parent.address_of_children[k + 1];
@@ -569,8 +574,8 @@ public:
         long address = find_corresponding_leaf(value);
         return delete_the_node(address, value);
     }
-    sjtu::vector<T> find(const T& minimal, const T& maximal) {
-        sjtu::vector<T> values;
+    std::vector<T> find(const T& minimal, const T& maximal) {
+        std::vector<T> values;
         long address = find_corresponding_leaf(minimal);
         leaf_Node<T, V, M, L> node;
         File.seekg(address);
@@ -648,7 +653,7 @@ public:
 int main() {
     int n;
     std::cin >> n;
-    B_plus_tree<key_value, key_value, 53, 33> bpt("File_for_bpt");
+    B_plus_tree<key_value, key_value, 51, 28> bpt("File_for_bpt");
     for (int i = 0; i < n; i++) {
         std::string operation;
         std::cin >> operation;
@@ -671,7 +676,7 @@ int main() {
             std::cin >> key;
             key_value minimal(key, INT_MIN);
             key_value maximal(key, INT_MAX);
-            sjtu::vector<key_value> tmp = bpt.find(minimal, maximal);
+            std::vector<key_value> tmp = bpt.find(minimal, maximal);
             if (tmp.size() == 0) {
                 std::cout << "null" << std::endl;
             } else {
