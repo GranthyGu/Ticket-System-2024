@@ -503,7 +503,7 @@ public:
 int main() {
     int n;
     std::cin >> n;
-    B_plus_tree<key_value, 54, 54> bpt("File_for_bpt");
+    B_plus_tree<key_value, 51, 51> bpt("File_for_bpt");
     for (int i = 0; i < n; i++) {
         std::string operation;
         std::cin >> operation;
