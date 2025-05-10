@@ -471,6 +471,12 @@ private:
                 }
                 child.size = left_size;
                 right_child.size = right_size;
+                File.seekp(address);
+                parent.write_to_file(File);
+                File.seekp(parent.address_of_children[k]);
+                child.write_to_file(File);
+                File.seekg(parent.address_of_children[k + 1]);
+                right_child.write_to_file(File);
                 return;
             }
         }

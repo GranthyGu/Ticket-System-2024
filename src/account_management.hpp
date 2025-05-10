@@ -8,58 +8,46 @@
 #include "token_scanner.hpp"
 #include <string>
 
-class username_password {
+class username {
 public:
-    char username[20];
-    char password[30];
-    username_password();
-    username_password(std::string, std::string);
-    username_password operator=(const username_password&);
-    bool operator<(const username_password&);
-    bool operator>(const username_password&);
-    bool operator==(const username_password&);
+    char username_[20];
+    username();
+    username(std::string);
+    username operator=(const username&);
+    bool operator<(const username&);
+    bool operator>(const username&);
+    bool operator==(const username&);
 };
-class username_name {
+class password {
 public:
-    char username[20];
-    char name[20];
-    username_name();
-    username_name(std::string, std::string);
-    username_name operator=(const username_name&);
-    bool operator<(const username_name&);
-    bool operator>(const username_name&);
-    bool operator==(const username_name&);
+    char password_[30];
+    password();
+    password(std::string);
+    password operator=(const password&);
 };
-class username_mail_address {
+class name {
 public:
-    char username[20];
-    char mail_address[30];
-    username_mail_address();
-    username_mail_address(std::string, std::string);
-    username_mail_address operator=(const username_mail_address&);
-    bool operator<(const username_mail_address&);
-    bool operator>(const username_mail_address&);
-    bool operator==(const username_mail_address&);
+    char name_[20];
+    name();
+    name(std::string);
+    name operator=(const name&);
 };
-class username_privilege {
+class mail_address {
 public:
-    char username[20];
-    int privilege;
-    username_privilege();
-    username_privilege(std::string, std::string);
-    username_privilege operator=(const username_privilege&);
-    bool operator<(const username_privilege&);
-    bool operator>(const username_privilege&);
-    bool operator==(const username_privilege&);
+    char mail_address_[30];
+    mail_address();
+    mail_address(std::string);
+    mail_address operator=(const mail_address&);
 };
+
 class account_management {
 private:
-    B_plus_tree<username_password, 69, 69> username_password_tree;
-    B_plus_tree<username_name, 83, 83> username_name_tree;
-    B_plus_tree<username_mail_address, 69, 69> username_mail_address_tree;
-    B_plus_tree<username_privilege, 120, 120> username_privilege_tree;
+    B_plus_tree<username, password, 69, 69> username_password_tree;
+    B_plus_tree<username, name, 83, 83> username_name_tree;
+    B_plus_tree<username, mail_address, 69, 69> username_mail_address_tree;
+    B_plus_tree<username, int, 120, 120> username_privilege_tree;
 public:
-    sjtu::vector<username_privilege> log_in_stack;
+    sjtu::vector<std::pair<username,int>> log_in_stack;
     account_management();
     void add_user(const token_scanner&);
     void log_in(const token_scanner&);
