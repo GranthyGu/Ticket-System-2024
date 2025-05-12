@@ -42,10 +42,10 @@ public:
 
 class account_management {
 private:
-    B_plus_tree<username, password, 69, 69> username_password_tree;
-    B_plus_tree<username, name, 83, 83> username_name_tree;
-    B_plus_tree<username, mail_address, 69, 69> username_mail_address_tree;
-    B_plus_tree<username, int, 120, 120> username_privilege_tree;
+    B_plus_tree<username, password, 142, 80> username_password_tree;
+    B_plus_tree<username, name, 142, 95> username_name_tree;
+    B_plus_tree<username, mail_address, 142, 80> username_mail_address_tree;
+    B_plus_tree<username, int, 142, 150> username_privilege_tree;
 public:
     sjtu::vector<std::pair<username,int>> log_in_stack;
     account_management();

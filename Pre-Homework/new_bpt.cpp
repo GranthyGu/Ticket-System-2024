@@ -1,8 +1,7 @@
 #include <iostream>
 #include <string>
 #include <fstream>
-#include <vector>
-#include <climits>
+#include "vector/vector.hpp"
 
 template<typename T, const int M, const int L>
 class Node {
@@ -580,8 +579,8 @@ public:
         long address = find_corresponding_leaf(value);
         return delete_the_node(address, value);
     }
-    std::vector<T> find(const T& minimal, const T& maximal) {
-        std::vector<T> values;
+    sjtu::vector<T> find(const T& minimal, const T& maximal) {
+        sjtu::vector<T> values;
         long address = find_corresponding_leaf(minimal);
         leaf_Node<T, V, M, L> node;
         File.seekg(address);
@@ -682,7 +681,7 @@ int main() {
             std::cin >> key;
             key_value minimal(key, INT_MIN);
             key_value maximal(key, INT_MAX);
-            std::vector<key_value> tmp = bpt.find(minimal, maximal);
+            sjtu::vector<key_value> tmp = bpt.find(minimal, maximal);
             if (tmp.size() == 0) {
                 std::cout << "null" << std::endl;
             } else {

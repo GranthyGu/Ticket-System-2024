@@ -4,6 +4,5 @@ project(MapListTest)
 set(CMAKE_CXX_STANDARD 17)
 
 add_executable(code
-        src/token_scanner.cpp
-        src/main.cpp
+        Pre-Homework/new_bpt.cpp
 )

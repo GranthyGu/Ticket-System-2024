@@ -158,7 +158,8 @@ void account_management::log_in(const token_scanner& ts) {
             return;
         }
     }
-    sjtu::vector<std::pair<username, password>> find_result = username_password_tree.find(username(username_), username(username_));
+    sjtu::vector<std::pair<username, password>> 
+        find_result = username_password_tree.find(username(username_), username(username_));
     if (find_result.empty()) {
         std::cout << '[' << ts.time << ']' << ' ' << -1 << std::endl;
         return;
@@ -168,7 +169,8 @@ void account_management::log_in(const token_scanner& ts) {
         std::cout << '[' << ts.time << ']' << ' ' << -1 << std::endl;
         return;
     }
-    sjtu::vector<std::pair<username, int>> find_result_ = username_privilege_tree.find(username(username_), username(username_));
+    sjtu::vector<std::pair<username, int>> 
+        find_result_ = username_privilege_tree.find(username(username_), username(username_));
     log_in_stack.push_back(std::make_pair(username(username_), find_result_[0].second));
     std::cout << '[' << ts.time << ']' << ' ' << 0 << std::endl;
     return;
@@ -209,12 +211,13 @@ void account_management::query_profile(const token_scanner& ts) {
     }
     if (cur_username == username_) {
         std::cout << '[' << ts.time << ']' << ' ' << username_
-                << ' ' << username_name_tree.find(username(username_), username(username_))[0].second.name_
-                << ' ' << username_mail_address_tree.find(username(username_), username(username_))[0].second.mail_address_
-                << ' ' << current_privilege << std::endl;
+            << ' ' << username_name_tree.find(username(username_), username(username_))[0].second.name_
+            << ' ' << username_mail_address_tree.find(username(username_), username(username_))[0].second.mail_address_
+            << ' ' << current_privilege << std::endl;
         return;
     } else {
-        sjtu::vector<std::pair<username, int>> find_result = username_privilege_tree.find(username(username_), username(username_));
+        sjtu::vector<std::pair<username, int>> 
+            find_result = username_privilege_tree.find(username(username_), username(username_));
         if (find_result.empty()) {
             std::cout << '[' << ts.time << ']' << ' ' << -1 << std::endl;
             return;
@@ -225,9 +228,9 @@ void account_management::query_profile(const token_scanner& ts) {
             return;
         }
         std::cout << '[' << ts.time << ']' << ' ' << username_
-                << ' ' << username_name_tree.find(username(username_), username(username_))[0].second.name_
-                << ' ' << username_mail_address_tree.find(username(username_), username(username_))[0].second.mail_address_
-                << ' ' << privilege << std::endl;
+            << ' ' << username_name_tree.find(username(username_), username(username_))[0].second.name_
+            << ' ' << username_mail_address_tree.find(username(username_), username(username_))[0].second.mail_address_
+            << ' ' << privilege << std::endl;
         return;
     }
 }
@@ -272,7 +275,8 @@ void account_management::modify_profile(const token_scanner& ts) {
         return;
     }
     if (cur_username != username_) {
-        sjtu::vector<std::pair<username, int>> find_result = username_privilege_tree.find(username(username_), username(username_));
+        sjtu::vector<std::pair<username, int>> 
+            find_result = username_privilege_tree.find(username(username_), username(username_));
         if (find_result.empty()) {
             std::cout << '[' << ts.time << ']' << ' ' << -1 << std::endl;
             return;
@@ -300,8 +304,8 @@ void account_management::modify_profile(const token_scanner& ts) {
         username_privilege_tree.insert(username(username_), std::stoi(privilege_));
     }
     std::cout << '[' << ts.time << ']' << ' ' << username_
-            << ' ' << username_name_tree.find(username(username_), username(username_))[0].second.name_
-            << ' ' << username_mail_address_tree.find(username(username_), username(username_))[0].second.mail_address_
-            << ' ' << username_privilege_tree.find(username(username_), username(username_))[0].second << std::endl;
+        << ' ' << username_name_tree.find(username(username_), username(username_))[0].second.name_
+        << ' ' << username_mail_address_tree.find(username(username_), username(username_))[0].second.mail_address_
+        << ' ' << username_privilege_tree.find(username(username_), username(username_))[0].second << std::endl;
     return;
 }
