@@ -42,6 +42,16 @@
         "algorithm": "cpp",
         "__split_buffer": "cpp",
         "array": "cpp",
-        "vector": "cpp"
+        "vector": "cpp",
+        "__hash_table": "cpp",
+        "__node_handle": "cpp",
+        "optional": "cpp",
+        "unordered_map": "cpp",
+        "__tree": "cpp",
+        "complex": "cpp",
+        "deque": "cpp",
+        "iterator": "cpp",
+        "map": "cpp",
+        "queue": "cpp"
     }
 }

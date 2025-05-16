@@ -4,7 +4,7 @@
 #define ACCOUNT_MANAGEMENT_HPP
 
 #include "b_plus_tree.hpp"
-#include "vector/vector.hpp"
+#include "STL/vector.hpp"
 #include "token_scanner.hpp"
 #include <string>
 
@@ -18,6 +18,7 @@ public:
     bool operator>(const username&);
     bool operator==(const username&);
 };
+
 class password {
 public:
     char password_[30];
@@ -25,6 +26,7 @@ public:
     password(std::string);
     password operator=(const password&);
 };
+
 class name {
 public:
     char name_[20];
@@ -32,6 +34,7 @@ public:
     name(std::string);
     name operator=(const name&);
 };
+
 class mail_address {
 public:
     char mail_address_[30];
