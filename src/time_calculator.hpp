@@ -18,6 +18,8 @@ public:
     bool operator<(const Time&);
     bool operator>(const Time&);
     void add_minute(int);
+    std::string to_string();
+    int operator-(const Time&);
 };
 class date {
 public:
@@ -30,20 +32,11 @@ public:
     bool operator<(const date&);
     bool operator>(const date&);
     bool operator!=(const date&);
+    bool operator==(const date&);
     void add_day(int);
-};
-
-class Time_calculator {
-public:
-    date date_;
-    Time time_;
-    Time_calculator();
-    Time_calculator(std::string, std::string);
-    Time_calculator(date, Time);
-    Time_calculator operator=(const Time_calculator&);
-    bool operator<(const Time_calculator&);
-    bool operator>(const Time_calculator&);
-    Time_calculator add_time(int);
+    std::string to_string();
+    void minus_day(int);
+    int delta_day();
 };
 
 #endif    //TIME_CALCULATOR_HPP

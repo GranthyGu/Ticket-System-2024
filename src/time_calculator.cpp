@@ -51,6 +51,29 @@ void Time::add_minute(int m) {
     hour = hh;
     day = day_;
 }
+std::string Time::to_string() {
+    std::string time_;
+    if (hour < 10) {
+        time_ += '0';
+    }
+    time_ += std::to_string(hour);
+    time_ += ':';
+    if (minute < 10) {
+        time_ += '0';
+    }
+    time_ += std::to_string(minute);
+    return time_;
+}
+int Time::operator-(const Time& other) {
+    int ans = 0;
+    int delta_d = day - other.day;
+    ans += delta_d * 1440;
+    int delta_hour = hour - other.hour;
+    ans += delta_hour * 60;
+    int delta_minute = minute - other.minute;
+    ans += delta_minute;
+    return ans;
+}
 
 date::date() {
     month = 0;
@@ -89,6 +112,9 @@ bool date::operator>(const date& other) {
 bool date::operator!=(const date& other) {
     return (month != other.month) || (day != other.day);
 }
+bool date::operator==(const date& other) {
+    return (month == other.month) && (day == other.day);
+}
 void date::add_day(int d) {
     int cur_day = day + d;
     if (month == 6) {
@@ -99,39 +125,39 @@ void date::add_day(int d) {
         day = (cur_day - 1) % 31 + 1;
     }
 }
-
-Time_calculator::Time_calculator() {}
-Time_calculator::Time_calculator(std::string str1, std::string str2) {
-    date d(str1);
-    Time t(str2);
-    date_ = d;
-    time_ = t;
-}
-Time_calculator::Time_calculator(date d, Time t) {
-    date_ = d;
-    time_ = t;
-}
-Time_calculator Time_calculator::operator=(const Time_calculator& other) {
-    date_ = other.date_;
-    time_ = other.time_;
-    return *this;
-}
-bool Time_calculator::operator<(const Time_calculator& other) {
-    if (date_ != other.date_) {
-        return date_ < other.date_;
+std::string date::to_string() {
+    std::string time_;
+    if (month < 10) {
+        time_ += '0';
     }
-    return time_ < other.time_;
-}
-bool Time_calculator::operator>(const Time_calculator& other) {
-    if (date_ != other.date_) {
-        return date_ > other.date_;
+    time_ += std::to_string(month);
+    time_ += '-';
+    if (day < 10) {
+        time_ += '0';
     }
-    return time_ > other.time_;
+    time_ += std::to_string(day);
+    return time_;
 }
-Time_calculator Time_calculator::add_time(int m) {
-    Time_calculator new_calculator = *this;
-    new_calculator.time_.add_minute(m);
-    new_calculator.date_.add_day(new_calculator.time_.day);
-    new_calculator.time_.day = 0;
-    return new_calculator;
+void date::minus_day(int d) {
+    if (day > d) {
+        day -= d;
+    } else {
+        int minus_ = d - day;
+        month--;
+        if (month == 6) {
+            day = 30 - minus_;
+        } else {
+            day = 31 - minus_;
+        }
+    }
+    return;
+}
+int date::delta_day() {
+    int delta_month = month - 6;
+    int delta_day = day - 1;
+    if (delta_month == 2) {
+        return 61 + delta_day;
+    } else {
+        return delta_month * 30 + delta_day;
+    }
 }

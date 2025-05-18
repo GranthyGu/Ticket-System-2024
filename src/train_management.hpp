@@ -17,30 +17,31 @@ public:
     train_id();
     train_id(std::string);
     train_id operator=(const train_id&);
-    bool operator<(const train_id&);
-    bool operator>(const train_id&);
-    bool operator==(const train_id&);
+    bool operator<(const train_id&) const;
+    bool operator>(const train_id&) const;
+    bool operator==(const train_id&) const;
 };
 
 class information {
 public:
     int station_num;
     char type;
-    char stations[3005];
-    Time_calculator sale_date_begin;
-    Time_calculator sale_date_end;
-    int prices[100];    // prefix_sum
+    char stations[3005] = {0};
+    date sale_date_begin;
+    date sale_date_end;
+    int prices[100] = {0};    // prefix_sum
     information();
-    information(std::string, std::string, std::string, std::string);
+    information(std::string, std::string, std::string, std::string, std::string);
     information operator=(const information&);
+    sjtu::vector<std::string> get_stations();
 };
 
 class train_information{
 public:
-    int seat_num[100];
+    int seat_num[100][92];
     Time start_time;
-    Time arrive_time[100];   // arrive_time[i] saves the time to the ith station.
-    Time leaving_time[100];
+    Time arriving_time[100];   // arriving_time[i] saves the time to the ith station.
+    Time leaving_time[100];    // leaving_time[i] saves the time leave the ith station.
     bool released = false;
     train_information();
     train_information(std::string, std::string, std::string, std::string);
@@ -50,20 +51,34 @@ public:
 class station {
 public:
     char station_name[30];
+    train_id id;
+    Time time_arrival;
+    Time time_leave;
     station();
-    station(std::string);
+    station(std::string, std::string, Time, Time);
     station operator=(const station&);
-    bool operator<(const station&);
-    bool operator>(const station&);
-    bool operator==(const station&);
+    bool operator<(const station&) const;
+    bool operator>(const station&) const;
+    bool operator==(const station&) const;
+};
+
+struct temp {
+    station begin;
+    station end;
+    int time_;
+    int price;
+    int index_begin;
+    int index_end;
 };
 
 class train_management {
 private:
     B_plus_tree<train_id, information, 100, 100> basic_information;
     B_plus_tree<train_id, train_information, 100, 100> advanced_information;
-    B_plus_tree<station, train_id, 100, 100> released_station_train_id_list;
+    B_plus_tree<station, std::pair<int, int>, 100, 100> released_station_train_id_list;
     sjtu::map<std::string, std::string> station_name;
+    sjtu::vector<temp> query_ticket_(std::string, std::string, date);
+    sjtu::vector<std::pair<temp, int>> query_ticket__(std::string, std::string, date, Time time);
 public:
     train_management();
     void add_train(const token_scanner&);

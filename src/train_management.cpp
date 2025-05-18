@@ -1,0 +1,622 @@
+// Created by GranthyGu on 2025/5/16
+
+#include "train_management.hpp"
+
+train_id::train_id() {}
+train_id::train_id(std::string str) {
+    for (int i = 0; i < str.size(); i++) {
+        id[i] = str[i];
+    }
+}
+train_id train_id::operator=(const train_id& other) {
+    for (int i = 0; i < 20; i++) {
+        id[i] = other.id[i];
+    }
+}
+bool train_id::operator<(const train_id& other) const {
+    for (int i = 0; i < 20; i++) {
+        if (id[i] != other.id[i]) {
+            return id[i] < other.id[i];
+        }
+    }
+    return false;
+}
+bool train_id::operator>(const train_id& other) const {
+    for (int i = 0; i < 20; i++) {
+        if (id[i] != other.id[i]) {
+            return id[i] > other.id[i];
+        }
+    }
+    return false;
+}
+bool train_id::operator==(const train_id& other) const {
+    for (int i = 0; i < 20; i++) {
+        if (id[i] != other.id[i]) {
+            return false;
+        }
+    }
+    return true;
+}
+
+station::station() {}
+station::station(std::string str, std::string str_, Time t, Time t_) {
+    for (int i = 0; i < str.size(); i++) {
+        station_name[i] = str[i];
+    }
+    train_id id_(str_);
+    id = id_;
+    time_arrival = t;
+    time_leave = t_;
+}
+station station::operator=(const station& other) {
+    for (int i = 0; i < 30; i++) {
+        station_name[i] = other.station_name[i];
+    }
+    id = other.id;
+    time_arrival = other.time_arrival;
+    time_leave = other.time_leave;
+}
+bool station::operator<(const station& other) const {
+    for (int i = 0; i < 30; i++) {
+        if (station_name[i] != other.station_name[i]) {
+            return station_name[i] < other.station_name[i];
+        }
+    }
+    return id < other.id;
+}
+bool station::operator>(const station& other) const {
+    for (int i = 0; i < 30; i++) {
+        if (station_name[i] != other.station_name[i]) {
+            return station_name[i] > other.station_name[i];
+        }
+    }
+    return id > other.id;
+}
+bool station::operator==(const station& other) const {
+    for (int i = 0; i < 30; i++) {
+        if (station_name[i] != other.station_name[i]) {
+            return false;
+        }
+    }
+    return id == other.id;
+}
+
+information::information() {}
+information::information(std::string num, std::string type_, std::string stations,
+                         std::string sale_date, std::string price) {
+    station_num = std::stoi(num);
+    type = type_[0];
+    std::string begin, end;
+    for (int i = 0; i < 5; i++) {
+        begin += sale_date[i];
+    }
+    for (int i = 6; i < 11; i++) {
+        end += sale_date[i];
+    }
+    date begin_(begin), end_(end);
+    sale_date_begin = begin_;
+    sale_date_end = end_;
+    std::string temp;
+    int flag = 0;
+    for (int i = 0; i < stations.size(); i++) {
+        if (stations[i] != '|') {
+            temp += stations[i];
+        } else {
+            for (int j = flag * 30; j < flag * 30 + temp.size(); j++) {
+                stations[j] = temp[j - flag * 30];
+            }
+            flag++;
+            temp.clear();
+        }
+    }
+    for (int j = flag * 30; j < flag * 30 + temp.size(); j++) {
+        stations[j] = temp[j - flag * 30];
+    }
+    temp.clear();
+    sjtu::vector<int> prices_;
+    for (int i = 0; i < price.size(); i++) {
+        if (stations[i] != '|') {
+            temp += price[i];
+        } else {
+            prices_.push_back(std::stoi(temp));
+            temp.clear();
+        }
+    }
+    prices_.push_back(std::stoi(temp));
+    for (int i = 1; i <= prices_.size(); i++) {
+        prices[i] = prices[i - 1] + prices_[i];
+    }
+}
+information information::operator=(const information& other) {
+    station_num = other.station_num;
+    type = other.type;
+    sale_date_begin = other.sale_date_begin;
+    sale_date_end = other.sale_date_end;
+    for (int i = 0; i < 100; i++) {
+        prices[i] = other.prices[i];
+    }
+    for (int i = 0; i < 3005; i++) {
+        stations[i] = other.stations[i];
+    }
+    return *this;
+}
+sjtu::vector<std::string> information::get_stations() {
+    sjtu::vector<std::string> v;
+    for (int i = 0; i < station_num; i++) {
+        std::string temp;
+        for (int j = 30 * i; j < 30 * (i + 1); i++) {
+            if (stations[j] != '\0') {
+                temp += stations[j];
+            } else {
+                break;
+            }
+        }
+        v.push_back(temp);
+    }
+    return v;
+}
+
+train_information::train_information() {}
+train_information::train_information(std::string str1, std::string str2, std::string str3, std::string str4) {
+    int num = std::stoi(str1);
+    for (int i = 0; i < 100; i++) {
+        for (int j = 0; j < 92; j++) {
+            seat_num[i][j] = num;
+        }
+    }
+    Time start(str2);
+    start_time = start;
+    std::vector<int> arrive, leave;
+    std::string temp;
+    for (int i = 0; i < str3.size(); i++) {
+        if (str3[i] != '|') {
+            temp += str3[i];
+        } else {
+            arrive.push_back(std::stoi(temp));
+            temp.clear();
+        }
+    }
+    arrive.push_back(std::stoi(temp));
+    temp.clear();
+    if (arrive.size() > 1) {
+        for (int i = 0; i < str4.size(); i++) {
+            if (str4[i] != '|') {
+                temp += str4[i];
+            } else {
+                leave.push_back(std::stoi(temp));
+                temp.clear();
+            }
+        }
+        leave.push_back(std::stoi(temp));
+    }
+    arriving_time[0] = start;
+    leaving_time[0] = start;
+    for (int i = 1; i < arrive.size(); i++) {
+        start.add_minute(arrive[i - 1]);
+        arriving_time[i] = start;
+        start.add_minute(leave[i - 1]);
+        leaving_time[i] = start;
+    }
+    start.add_minute(arrive[arrive.size() - 1]);
+    arriving_time[arrive.size()] = start;
+}
+train_information train_information::operator=(const train_information& other) {
+    for (int i = 0; i < 100; i++) {
+        for (int j = 0; j < 92; j++) {
+            seat_num[i][j] = other.seat_num[i][j];
+        }
+        arriving_time[i] = other.arriving_time[i];
+        leaving_time[i] = other.leaving_time[i];
+    }
+    start_time = other.start_time;
+}
+
+train_management::train_management() {
+    basic_information.set_file_name("train_information_1");
+    advanced_information.set_file_name("train_information_2");
+    released_station_train_id_list.set_file_name("train_released_list");
+}
+void train_management::add_train(const token_scanner& ts) {
+    std::string trainID, station_num_, seat_num_, stations_, prices_, start_time_,
+                travel_times_, stop_over_times_, sale_date_, type_;
+    for (int i = 0; i < ts.key_argument.size(); i++) {
+        if (ts.key_argument[i].first == 'i') {
+            trainID= ts.key_argument[i].second;
+        } else if (ts.key_argument[i].first == 'n') {
+            station_num_ = ts.key_argument[i].second;
+        } else if (ts.key_argument[i].first == 'm') {
+            seat_num_ = ts.key_argument[i].second;
+        } else if (ts.key_argument[i].first == 's') {
+            stations_ = ts.key_argument[i].second;
+        } else if (ts.key_argument[i].first == 'p') {
+            prices_ = ts.key_argument[i].second;
+        } else if (ts.key_argument[i].first == 'x') {
+            start_time_ = ts.key_argument[i].second;
+        } else if (ts.key_argument[i].first == 't') {
+            travel_times_ = ts.key_argument[i].second;
+        } else if (ts.key_argument[i].first == 'o') {
+            stop_over_times_ = ts.key_argument[i].second;
+        } else if (ts.key_argument[i].first == 'd') {
+            sale_date_ = ts.key_argument[i].second;
+        } else if (ts.key_argument[i].first == 'y') {
+            type_ = ts.key_argument[i].second;
+        }
+    }
+    information info(station_num_, type_, stations_, sale_date_, prices_);
+    train_information info_(seat_num_, start_time_, travel_times_, stop_over_times_);
+    train_id id(trainID);
+    sjtu::vector<std::pair<train_id, information>> v = basic_information.find(id, id);
+    if (!v.empty()) {
+        std::cout << '[' << ts.time << ']' << ' ' << -1 << std::endl;
+        return;
+    }
+    basic_information.insert(id, info);
+    advanced_information.insert(id, info_);
+    std::cout << '[' << ts.time << ']' << ' ' << 0 << std::endl;
+    return;
+}
+void train_management::delete_train(const token_scanner& ts) {
+    std::string ID = ts.key_argument[0].second;
+    train_id id(ID);
+    sjtu::vector<std::pair<train_id, train_information>> v = advanced_information.find(id, id);
+    if (v.empty() || v[0].second.released) {
+        std::cout << '[' << ts.time << ']' << ' ' << -1 << std::endl;
+        return;
+    }
+    basic_information.remove(id);
+    advanced_information.remove(id);
+}
+void train_management::release_train(const token_scanner& ts) {
+    std::string ID = ts.key_argument[0].second;
+    train_id id(ID);
+    sjtu::vector<std::pair<train_id, train_information>> v = advanced_information.find(id, id);
+    sjtu::vector<std::pair<train_id, information>> v_ = basic_information.find(id, id);
+    if (v.empty() || v[0].second.released) {
+        std::cout << '[' << ts.time << ']' << ' ' << -1 << std::endl;
+        return;
+    }
+    information info = v_[0].second;
+    train_information info_ = v[0].second;
+    advanced_information.remove(id);
+    info_.released = true;
+    advanced_information.insert(id, info_);
+    sjtu::vector<std::string> station_info = info.get_stations();
+    for (int i = 0; i < station_info.size(); i++) {
+        station_name.insert({station_info[i], station_info[i]});
+        station station_(station_info[i], ID, info_.arriving_time[i], info_.leaving_time[i]);
+        released_station_train_id_list.insert(station_, {i, info.prices[i]});
+    }
+    std::cout << '[' << ts.time << ']' << ' ' << 0 << std::endl;
+    return;
+}
+void train_management::query_train(const token_scanner& ts) {
+    std::string ID, date_;
+    for (int i = 0; i < ts.key_argument.size(); i++) {
+        if (ts.key_argument[i].first == 'i') {
+            ID= ts.key_argument[i].second;
+        } else if (ts.key_argument[i].first == 'd') {
+            date_ = ts.key_argument[i].second;
+        }
+    }
+    train_id id(ID);
+    date date_of_train(date_);
+    sjtu::vector<std::pair<train_id, train_information>> v = advanced_information.find(id, id);
+    sjtu::vector<std::pair<train_id, information>> v_ = basic_information.find(id, id);
+    if (v.empty()) {
+        std::cout << '[' << ts.time << ']' << ' ' << -1 << std::endl;
+        return;
+    }
+    information info = v_[0].second;
+    train_information info_ = v[0].second;
+    if (info.sale_date_begin > date_of_train || info.sale_date_end < date_of_train) {
+        std::cout << '[' << ts.time << ']' << ' ' << -1 << std::endl;
+        return;
+    }
+    sjtu::vector<std::string> stations_info = info.get_stations();
+    std::cout << '[' << ts.time << ']' << ' ' << ID << ' ' << info.type << std::endl;
+    for (int i = 0; i < info.station_num; i++) {
+        std::cout << stations_info[i] << ' ';
+        if (i == 0) {
+            std::cout << "xx-xx xx:xx ";
+        } else {
+            Time t = info_.arriving_time[i];
+            date day_ = date_of_train;
+            day_.add_day(t.day);
+            std::cout << day_.to_string() << ' ' << t.to_string() << " -> ";
+        }
+        if (i == info.station_num - 1) {
+            std::cout << "xx-xx xx:xx ";
+        } else {
+            Time t = info_.leaving_time[i];
+            date day_ = date_of_train;
+            day_.add_day(t.day);
+            std::cout << day_.to_string() << ' ' << t.to_string() << ' ';
+        }
+        std::cout << info.prices[i] << ' ';
+        int delta = date_of_train.delta_day();
+        if (i == info.station_num - 1) {
+            std::cout << 'x' << std::endl;
+        } else {
+            std::cout << info_.seat_num[i][delta] << std::endl;
+        }
+    }
+}
+
+bool compare_time(const temp &a, const temp &b) {
+    if (a.time_ != b.time_) {
+        return a.time_ < b.time_;
+    }
+    return a.begin.id < b.begin.id;
+}
+bool compare_price(const temp &a, const temp &b) {
+    if (a.price != b.price) {
+        return a.price < b.price;
+    }
+    return a.begin.id < b.begin.id;
+}
+bool compare_time_transfer(const std::pair<std::pair<temp, temp>, int>& a, const std::pair<std::pair<temp, temp>, int>& b) {
+    int a_time = 1440 * a.second + a.first.first.time_ + a.first.second.time_ + (a.first.second.begin.time_leave.hour - a.first.first.end.time_arrival.hour) * 60 
+                 + (a.first.second.begin.time_leave.minute - a.first.first.end.time_arrival.minute); 
+    int b_time = 1440 * b.second + b.first.first.time_ + b.first.second.time_ + (b.first.second.begin.time_leave.hour - b.first.first.end.time_arrival.hour) * 60 
+                 + (b.first.second.begin.time_leave.minute - b.first.first.end.time_arrival.minute); 
+    int a_price = a.first.first.price + a.first.second.price;
+    int b_price = b.first.first.price + b.first.second.price;
+    if (a_time != b_time) {
+        return a_time < b_time;
+    }
+    if (a_price != b_price) {
+        return a_price < b_price;
+    }
+    if (!(a.first.first.begin.id == b.first.first.begin.id)) {
+        return a.first.first.begin.id < b.first.first.begin.id;
+    }
+    return a.first.second.begin.id == b.first.second.begin.id;
+}
+bool compare_price_transfer(const std::pair<std::pair<temp, temp>, int>& a, const std::pair<std::pair<temp, temp>, int> b) {
+    int a_time = 1440 * a.second + a.first.first.time_ + a.first.second.time_ + (a.first.second.begin.time_leave.hour - a.first.first.end.time_arrival.hour) * 60 
+                 + (a.first.second.begin.time_leave.minute - a.first.first.end.time_arrival.minute); 
+    int b_time = 1440 * b.second + b.first.first.time_ + b.first.second.time_ + (b.first.second.begin.time_leave.hour - b.first.first.end.time_arrival.hour) * 60 
+                 + (b.first.second.begin.time_leave.minute - b.first.first.end.time_arrival.minute); 
+    int a_price = a.first.first.price + a.first.second.price;
+    int b_price = b.first.first.price + b.first.second.price;
+    if (a_price != b_price) {
+        return a_price < b_price;
+    }
+    if (a_time != b_time) {
+        return a_time < b_time;
+    }
+    if (!(a.first.first.begin.id == b.first.first.begin.id)) {
+        return a.first.first.begin.id < b.first.first.begin.id;
+    }
+    return a.first.second.begin.id == b.first.second.begin.id;
+}
+template <typename Compare, class T>
+void quick_sort(sjtu::vector<T> &v, int left, int right, Compare cmp) {
+    if (left >= right) return;
+    T pivot = v[left];
+    int i = left, j = right;
+    while (i < j) {
+        while (i < j && cmp(v[j], pivot)) j--;
+        while (i < j && cmp(v[i], pivot)) i++;
+        if (i < j) std::swap(v[i], v[j]);
+    }
+    std::swap(v[left], v[i]);
+    quick_sort(left, i - 1);
+    quick_sort(i + 1, right);
+}
+void sort_by_time(sjtu::vector<temp> &v) {
+    quick_sort(v, 0, v.size() - 1, compare_time);
+}
+void sort_by_price(sjtu::vector<temp> &v) {
+    quick_sort(v, 0, v.size() - 1, compare_price);
+}
+void sort_by_time_transfer(sjtu::vector<std::pair<std::pair<temp, temp>, int>> &v) {
+    quick_sort(v, 0, v.size() - 1, compare_time_transfer);
+}
+void sort_by_price_transfer(sjtu::vector<std::pair<std::pair<temp, temp>, int>> &v) {
+    quick_sort(v, 0, v.size() - 1, compare_price_transfer);
+}
+
+sjtu::vector<temp> train_management::query_ticket_(std::string start, std::string end, date date_) {
+    std::string min_id, max_id;
+    for (int i = 0; i < 20; i++) {
+        min_id += '\0';
+        max_id += '~';
+    }
+    Time t;
+    station minimal_start(start, min_id, t, t), maximal_start(start, max_id, t, t);
+    station minimal_end(end, min_id, t, t), maximal_end(end, max_id, t, t);
+    sjtu::vector<std::pair<station, std::pair<int, int>>> start_train = released_station_train_id_list.find(minimal_start, maximal_end);
+    sjtu::vector<std::pair<station, std::pair<int, int>>> end_train = released_station_train_id_list.find(minimal_start, maximal_end);
+    sjtu::vector<temp> train_satisfied;
+    for (int i = 0; i < start_train.size(); i++) {
+        station train = start_train[i].first;
+        for (int j = 0; j < end_train.size(); j++) {
+            station train_end = end_train[j].first;
+            if (train_end.id == train.id) {
+                if (train_end.time_arrival > train.time_arrival) {
+                    date d(date_);
+                    d.minus_day(train.time_leave.day);
+                    sjtu::vector<std::pair<train_id, information>> v_ = basic_information.find(train.id, train.id);
+                    information info = v_[0].second;
+                    if (info.sale_date_begin > d || info.sale_date_end < d) {
+                        break;
+                    }
+                    int price = end_train[j].second.second - start_train[i].second.second;
+                    int t = train_end.time_arrival - train.time_leave;
+                    int index_begin = start_train[i].second.first;
+                    int index_end = end_train[j].second.first;
+                    train_satisfied.push_back({train, train_end, t, price, index_begin, index_end});
+                }
+                break;
+            }
+        }
+    }
+    return train_satisfied;
+}
+sjtu::vector<std::pair<temp, int>> train_management::query_ticket__(std::string start, std::string end, date date_, Time time_) {
+    std::string min_id, max_id;
+    for (int i = 0; i < 20; i++) {
+        min_id += '\0';
+        max_id += '~';
+    }
+    Time t;
+    station minimal_start(start, min_id, t, t), maximal_start(start, max_id, t, t);
+    station minimal_end(end, min_id, t, t), maximal_end(end, max_id, t, t);
+    sjtu::vector<std::pair<station, std::pair<int, int>>> start_train = released_station_train_id_list.find(minimal_start, maximal_end);
+    sjtu::vector<std::pair<station, std::pair<int, int>>> end_train = released_station_train_id_list.find(minimal_start, maximal_end);
+    sjtu::vector<std::pair<temp, int>> train_satisfied;
+    for (int i = 0; i < start_train.size(); i++) {
+        station train = start_train[i].first;
+        for (int j = 0; j < end_train.size(); j++) {
+            station train_end = end_train[j].first;
+            if (train_end.id == train.id) {
+                if (train_end.time_arrival > train.time_arrival) {
+                    date d(date_);
+                    d.minus_day(train.time_leave.day);
+                    sjtu::vector<std::pair<train_id, information>> v_ = basic_information.find(train.id, train.id);
+                    information info = v_[0].second;
+                    if (info.sale_date_end < d || (info.sale_date_end == d && (train_end.time_leave.hour > time_.hour || (train_end.time_leave.hour == time_.hour && train_end.time_leave.minute > time_.minute)))) {
+                        break;
+                    }
+                    int price = end_train[j].second.second - start_train[i].second.second;
+                    int t = train_end.time_arrival - train.time_leave;
+                    int index_begin = start_train[i].second.first;
+                    int index_end = end_train[j].second.first;
+                    int day_;
+                    if (info.sale_date_begin > d) {
+                        day_ = info.sale_date_begin.delta_day() - d.delta_day();
+                    } else {
+                        if ((train_end.time_leave.hour < time_.hour || (train_end.time_leave.hour == time_.hour && train_end.time_leave.minute < time_.minute))) {
+                            day_ = 1;
+                        }
+                    }
+                    train_satisfied.push_back({{train, train_end, t, price, index_begin, index_end}, day_});
+                }
+                break;
+            }
+        }
+    }
+    return train_satisfied;
+}
+void train_management::query_ticket(const token_scanner& ts) {
+    std::string start, end, date_, sort_;
+    for (int i = 0; i < ts.key_argument.size(); i++) {
+        if (ts.key_argument[i].first == 's') {
+            start= ts.key_argument[i].second;
+        } else if (ts.key_argument[i].first == 'd') {
+            date_ = ts.key_argument[i].second;
+        } else if (ts.key_argument[i].first == 't') {
+            end = ts.key_argument[i].second;
+        } else if (ts.key_argument[i].first == 'p') {
+            sort_ = ts.key_argument[i].second;
+        }
+    }
+    date d(date_);
+    sjtu::vector<temp> train_satisfied = query_ticket_(start, end, d);
+    if (train_satisfied.empty()) {
+        std::cout << '[' << ts.time << ']' << ' ' << 0 << std::endl;
+        return;
+    }
+    if (sort_ == "cost") {
+        sort_by_price(train_satisfied);
+    } else if (sort_ == "time") {
+        sort_by_time(train_satisfied);
+    }
+    std::cout << '[' << ts.time << ']' << ' ' << train_satisfied.size() << std::endl;
+    for (int i = 0; i < train_satisfied.size(); i++) {
+        std::cout << train_satisfied[i].begin.id.id << ' ' << train_satisfied[i].begin.station_name << ' ';
+        date day(date_);
+        date day_ = day;
+        day_.minus_day(train_satisfied[i].begin.time_leave.day);
+        std::cout << day.to_string() << ' ' << train_satisfied[i].begin.time_leave.to_string() 
+                  << " -> " << train_satisfied[i].end.station_name << ' ';
+        day.add_day(train_satisfied[i].end.time_arrival.day - train_satisfied[i].begin.time_arrival.day);
+        std::cout << day.to_string() << ' ' << train_satisfied[i].end.time_arrival.to_string() << train_satisfied[i].price << ' ';
+        sjtu::vector<std::pair<train_id, train_information>> v = advanced_information.find(train_satisfied[i].begin.id, train_satisfied[i].begin.id);
+        train_information info_ = v[0].second;
+        int seat_ = 1e9;
+        int delta = day_.delta_day();
+        for (int j = train_satisfied[i].index_begin; j < train_satisfied[i].index_end; j++) {
+            seat_ = std::min(seat_, info_.seat_num[j][delta]);
+        }
+        std::cout << seat_ << std::endl;
+    }
+}
+void train_management::query_transfer(const token_scanner& ts) {
+    std::string start, end, date_, sort_;
+    for (int i = 0; i < ts.key_argument.size(); i++) {
+        if (ts.key_argument[i].first == 's') {
+            start= ts.key_argument[i].second;
+        } else if (ts.key_argument[i].first == 'd') {
+            date_ = ts.key_argument[i].second;
+        } else if (ts.key_argument[i].first == 't') {
+            end = ts.key_argument[i].second;
+        } else if (ts.key_argument[i].first == 'p') {
+            sort_ = ts.key_argument[i].second;
+        }
+    }
+    date d(date_);
+    sjtu::vector<std::string> stations = station_name.traverse();
+    sjtu::vector<std::pair<std::pair<temp, temp>, int>> train_satisfied;
+    for (int i = 0; i < stations.size(); i++) {
+        if (stations[i] == start || stations[i] == end) {
+            continue;
+        }
+        sjtu::vector<temp> train_satisfied_first = query_ticket_(start, stations[i], d);
+        for (int j = 0; j < train_satisfied_first.size(); j++) {
+            temp train_ = train_satisfied_first[j];
+            date arrive_transfer_date(date_);
+            arrive_transfer_date.add_day(train_.end.time_arrival.day - train_.begin.time_leave.day);
+            sjtu::vector<std::pair<temp, int>> train_satisfied_second = query_ticket__(stations[i], end, arrive_transfer_date, train_.end.time_arrival);
+            for (int k = 0; k < train_satisfied_second.size(); k++) {
+                if (train_.begin.id == train_satisfied_second[k].first.begin.id) {
+                    continue;
+                }
+                train_satisfied.push_back({{train_, train_satisfied_second[k].first}, train_satisfied_second[k].second});
+            }
+        }
+    }
+    if (train_satisfied.size() == 0) {
+        std::cout << '[' << ts.time << ']' << ' ' << 0 << std::endl;
+    }
+    if (sort_ == "time") {
+        sort_by_time_transfer(train_satisfied);
+    } else if (sort_ == "cost") {
+        sort_by_price_transfer(train_satisfied);
+    }
+    std::cout << '[' << ts.time << ']' << ' ' << std::endl;
+    std::cout << train_satisfied[0].first.first.begin.id.id << ' ' << train_satisfied[0].first.first.begin.station_name << ' ';
+    date day(date_);
+    date day_(date_);
+    day_.minus_day(train_satisfied[0].first.first.begin.time_leave.day);
+    std::cout << day.to_string() << ' ' << train_satisfied[0].first.first.begin.time_leave.to_string() 
+                << " -> " << train_satisfied[0].first.first.end.station_name << ' ';
+    day.add_day(train_satisfied[0].first.first.end.time_arrival.day - train_satisfied[0].first.first.begin.time_arrival.day);
+    std::cout << day.to_string() << ' ' << train_satisfied[0].first.first.end.time_arrival.to_string() << train_satisfied[0].first.first.price << ' ';
+    sjtu::vector<std::pair<train_id, train_information>> v = advanced_information.find(train_satisfied[0].first.first.begin.id, train_satisfied[0].first.first.begin.id);
+    train_information info_ = v[0].second;
+    int seat_ = 1e9;
+    int delta = day_.delta_day();
+    for (int j = train_satisfied[0].first.first.index_begin; j < train_satisfied[0].first.first.index_end; j++) {
+        seat_ = std::min(seat_, info_.seat_num[j][delta]);
+    }
+    std::cout << seat_ << std::endl;
+    std::cout << train_satisfied[0].first.second.begin.id.id << ' ' << train_satisfied[0].first.second.begin.station_name << ' ';
+    day.add_day(train_satisfied[0].second);
+    day_ = day;
+    day_.minus_day(train_satisfied[0].first.second.begin.time_leave.day);
+    std::cout << day.to_string() << ' ' << train_satisfied[0].first.second.begin.time_leave.to_string() 
+                << " -> " << train_satisfied[0].first.second.end.station_name << ' ';
+    day.add_day(train_satisfied[0].first.second.end.time_arrival.day - train_satisfied[0].first.second.begin.time_arrival.day);
+    std::cout << day.to_string() << ' ' << train_satisfied[0].first.second.end.time_arrival.to_string() << train_satisfied[0].first.second.price << ' ';
+    sjtu::vector<std::pair<train_id, train_information>> v = advanced_information.find(train_satisfied[0].first.second.begin.id, train_satisfied[0].first.second.begin.id);
+    train_information info_ = v[0].second;
+    seat_ = 1e9;
+    delta = day_.delta_day();
+    for (int j = train_satisfied[0].first.second.index_begin; j < train_satisfied[0].first.second.index_end; j++) {
+        seat_ = std::min(seat_, info_.seat_num[j][delta]);
+    }
+    std::cout << seat_ << std::endl;
+    return;
+}
