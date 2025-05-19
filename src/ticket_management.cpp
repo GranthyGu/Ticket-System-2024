@@ -293,3 +293,11 @@ void ticket_management::refund_ticket(const token_scanner& ts) {
     std::cout << '[' << ts.time << ']' << ' ' << 0 << std::endl;
     return;
 }
+void ticket_management::exit() {
+    standby_by_train_date.~B_plus_tree();
+    ticket_list_by_user.~B_plus_tree();
+}
+void ticket_management::clear() {
+    standby_by_train_date.clear();
+    ticket_list_by_user.clear();
+}

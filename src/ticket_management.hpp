@@ -23,6 +23,7 @@ public:
     bool operator>(const key_for_ticket&) const;
     bool operator==(const key_for_ticket&) const;
 };
+
 class info_for_ticket {
 public:
     date date_;
@@ -34,6 +35,7 @@ public:
     info_for_ticket(std::string, std::string, std::string, std::string, std::string);
     info_for_ticket operator=(const info_for_ticket&);
 };
+
 class key_for_ticket_user {
 public:
     int time_;
@@ -45,6 +47,7 @@ public:
     bool operator>(const key_for_ticket_user&) const;
     bool operator==(const key_for_ticket_user&) const;
 };
+
 class info_for_ticket_user {
 public:
     train_id id;
@@ -57,6 +60,7 @@ public:
     info_for_ticket_user(std::string, std::string, std::string, std::string, std::string);
     info_for_ticket_user operator=(const info_for_ticket_user&);
 };
+
 class ticket_management {
 private:
     train_management train_manage;
@@ -70,6 +74,8 @@ public:
     void buy_ticket(const token_scanner&);
     void query_order(const token_scanner&);
     void refund_ticket(const token_scanner&);
+    void exit();
+    void clear();
 };
 
 #endif      // TICKET_MANAGEMENT_HPP

@@ -1,7 +1,8 @@
 #include <iostream>
 #include <string>
 #include <fstream>
-#include "vector/vector.hpp"
+#include <vector>
+#include <climits>
 
 template<typename T, const int M, const int L>
 class Node {
@@ -579,8 +580,8 @@ public:
         long address = find_corresponding_leaf(value);
         return delete_the_node(address, value);
     }
-    sjtu::vector<T> find(const T& minimal, const T& maximal) {
-        sjtu::vector<T> values;
+    std::vector<std::pair<T, V>> find(const T& minimal, const T& maximal) {
+        std::vector<std::pair<T, V>> values;
         long address = find_corresponding_leaf(minimal);
         leaf_Node<T, V, M, L> node;
         File.seekg(address);
@@ -589,7 +590,7 @@ public:
         while (index < node.size && node.key[index] < minimal) {index++;}
         while (true) {
             while (index < node.size && (node.key[index] < maximal || node.key[index] == maximal)) {
-                values.push_back(node.key[index]);
+                values.push_back({node.key[index], node.key[index]});
                 index++;
             }
             if (node.address_of_right_node == -1 || node.key[node.size - 1] > maximal) {
@@ -658,7 +659,7 @@ public:
 int main() {
     int n;
     std::cin >> n;
-    B_plus_tree<key_value, key_value, 51, 28> bpt("File_for_bpt");
+    B_plus_tree<key_value, key_value, 52, 26> bpt("File_for_bpt");
     for (int i = 0; i < n; i++) {
         std::string operation;
         std::cin >> operation;
@@ -679,14 +680,14 @@ int main() {
         if (operation == "find") {
             std::string key;
             std::cin >> key;
-            key_value minimal(key, 5);
-            key_value maximal(key, 5);
-            sjtu::vector<key_value> tmp = bpt.find(minimal, maximal);
+            key_value minimal(key, INT_MIN);
+            key_value maximal(key, INT_MAX);
+            std::vector<std::pair<key_value, key_value>> tmp = bpt.find(minimal, maximal);
             if (tmp.size() == 0) {
                 std::cout << "null" << std::endl;
             } else {
                 for (int i = 0; i < tmp.size(); i++) {
-                    std::cout << tmp[i].value << ' ';
+                    std::cout << tmp[i].first.value << ' ';
                 }
                 std::cout << std::endl;
             }

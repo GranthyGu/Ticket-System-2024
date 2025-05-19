@@ -318,3 +318,17 @@ bool account_management::log_in_statu(const username& id) {
     }
     return false;
 }
+void account_management::exit() {
+    log_in_stack.clear();
+    username_password_tree.~B_plus_tree();
+    username_name_tree.~B_plus_tree();
+    username_mail_address_tree.~B_plus_tree();
+    username_privilege_tree.~B_plus_tree();
+}
+void account_management::clear() {
+    log_in_stack.clear();
+    username_password_tree.clear();
+    username_name_tree.clear();
+    username_mail_address_tree.clear();
+    username_privilege_tree.clear();
+}

@@ -28,7 +28,7 @@
 #include <iostream>
 #include <string>
 #include <fstream>
-#include "src/STL/vector.hpp"
+#include "STL/vector.hpp"
 
 template<typename T, const int M, const int L>
 class Node {
@@ -571,7 +571,6 @@ private:
         return true;
     }
 public:
-    B_plus_tree() {}
     B_plus_tree(std::string str) : file_name(str), address_of_root(0) {
         File.open(file_name, std::ios::in | std::ios::out | std::ios::binary);
         if (!File) {
@@ -599,50 +598,6 @@ public:
             address_of_root = address_before;
         }
     }
-    void set_file_name(std::string str) {
-        file_name = str;
-        File.open(file_name, std::ios::in | std::ios::out | std::ios::binary);
-        if (!File) {
-            File.clear();
-            File.open(file_name, std::ios::out | std::ios::binary);
-            File.close();
-            File.clear();
-            File.open(file_name, std::ios::in | std::ios::out | std::ios::binary);
-            Node<T, M, L> initial;
-            initial.is_leaf = 1;
-            leaf_Node<T, V, M, L> initial_leaf;
-            File.seekp(0);
-            initial.write_to_file(File);
-            initial.address_of_children[0] = File.tellp();
-            File.seekp(0);
-            initial.write_to_file(File);
-            initial_leaf.address_of_parent = 0;
-            initial_leaf.write_to_file(File);
-        } else {
-            long address_before;
-            File.seekg(0, std::ios::end);
-            long final_pos = File.tellg();
-            File.seekg(final_pos - sizeof(long));
-            File.read(reinterpret_cast<char*> (&address_before), sizeof(long));
-            address_of_root = address_before;
-        }
-    }
-    bool empty() {
-        File.seekg(address_of_root);
-        Node<T, M, L> node;
-        node.read_from_file(File);
-        if (node.is_leaf == 1 && node.size == 0) {
-            leaf_Node<T, V, M, L> leaf;
-            File.seekg(node.address_of_children[0]);
-            leaf.read_from_file(File);
-            return (leaf.size == 0);
-        } else {
-            return false;
-        }
-    }
-    ~B_plus_tree() {
-        put_root();
-    }
     bool insert(const T& key, const V& value) {
         long address = find_corresponding_leaf(key);
         return insert_to_bpt(address, key, value);
@@ -661,7 +616,7 @@ public:
         while (index < node.size && node.key[index] < minimal) {index++;}
         while (true) {
             while (index < node.size && (node.key[index] < maximal || node.key[index] == maximal)) {
-                values.push_back(std::make_pair(node.key[index], node.value[index]));
+                values.push_back({node.key[index], node.key[index]});
                 index++;
             }
             if (node.address_of_right_node == -1 || node.key[node.size - 1] > maximal) {

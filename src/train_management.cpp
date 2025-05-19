@@ -224,6 +224,7 @@ train_management::train_management() {
     advanced_information.set_file_name("train_information_2");
     released_station_train_id_list.set_file_name("train_released_list");
     station_name.set_file_name("station_names");
+    num = station_name.size() + 1;
 }
 void train_management::add_train(const token_scanner& ts) {
     std::string trainID, station_num_, seat_num_, stations_, prices_, start_time_,
@@ -291,7 +292,8 @@ void train_management::release_train(const token_scanner& ts) {
     advanced_information.insert(id, info_);
     sjtu::vector<std::string> station_info = info.get_stations();
     for (int i = 0; i < station_info.size(); i++) {
-        num += station_name.insert(num, station(station_info[i], ID, Time(), Time()));
+        bool flag = station_name.insert(num, station(station_info[i], ID, Time(), Time()));
+        num += flag;
         station station_(station_info[i], ID, info_.arriving_time[i], info_.leaving_time[i]);
         released_station_train_id_list.insert(station_, {i, info.prices[i]});
     }
@@ -722,4 +724,16 @@ void train_management::refund_ticket(const train_id& train, std::string begin, s
     }
     advanced_information.remove(train);
     advanced_information.insert(train, info);
+}
+void train_management::exit() {
+    basic_information.~B_plus_tree();
+    advanced_information.~B_plus_tree();
+    released_station_train_id_list.~B_plus_tree();
+    station_name.~B_plus_tree();
+}
+void train_management::clear() {
+    basic_information.clear();
+    advanced_information.clear();
+    released_station_train_id_list.clear();
+    station_name.clear();
 }

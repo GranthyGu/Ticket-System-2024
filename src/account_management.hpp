@@ -58,6 +58,8 @@ public:
     void query_profile(const token_scanner&);
     void modify_profile(const token_scanner&);
     bool log_in_statu(const username&);
+    void exit();
+    void clear();
 };
 
 #endif      //ACCOUNT_MANAGEMENT_HPP

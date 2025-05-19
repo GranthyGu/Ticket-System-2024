@@ -93,6 +93,8 @@ public:
     std::pair<date, int> query_buy(std::string, std::string, date, train_id, int, bool);
     std::pair<Time, Time> query_time(const train_id&, std::string);
     int query_price(const train_id&, std::string, std::string);
+    void exit();
+    void clear();
 };
 
 #endif    //TRAIN_MANAGEMENT_HPP
