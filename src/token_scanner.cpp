@@ -3,7 +3,7 @@
 #include "token_scanner.hpp"
 
 token_scanner::token_scanner(const std::string& input) {
-    int idx = 2;
+    int idx = 1;
     std::string time_;
     while (input[idx] != ']') {
         time_ += input[idx];

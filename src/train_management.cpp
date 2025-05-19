@@ -12,6 +12,7 @@ train_id train_id::operator=(const train_id& other) {
     for (int i = 0; i < 20; i++) {
         id[i] = other.id[i];
     }
+    return *this;
 }
 bool train_id::operator<(const train_id& other) const {
     for (int i = 0; i < 20; i++) {
@@ -63,6 +64,7 @@ station station::operator=(const station& other) {
     id = other.id;
     time_arrival = other.time_arrival;
     time_leave = other.time_leave;
+    return *this;
 }
 bool station::operator<(const station& other) const {
     for (int i = 0; i < 30; i++) {
@@ -217,6 +219,7 @@ train_information train_information::operator=(const train_information& other) {
         leaving_time[i] = other.leaving_time[i];
     }
     start_time = other.start_time;
+    return *this;
 }
 
 train_management::train_management() {
@@ -412,8 +415,8 @@ void quick_sort(sjtu::vector<T> &v, int left, int right, Compare cmp) {
         if (i < j) std::swap(v[i], v[j]);
     }
     std::swap(v[left], v[i]);
-    quick_sort(left, i - 1);
-    quick_sort(i + 1, right);
+    quick_sort(v, left, i - 1, cmp);
+    quick_sort(v, i + 1, right, cmp);
 }
 void sort_by_time(sjtu::vector<temp> &v) {
     quick_sort(v, 0, v.size() - 1, compare_time);
@@ -625,12 +628,12 @@ void train_management::query_transfer(const token_scanner& ts) {
                 << " -> " << train_satisfied[0].first.second.end.station_name << ' ';
     day.add_day(train_satisfied[0].first.second.end.time_arrival.day - train_satisfied[0].first.second.begin.time_arrival.day);
     std::cout << day.to_string() << ' ' << train_satisfied[0].first.second.end.time_arrival.to_string() << train_satisfied[0].first.second.price << ' ';
-    sjtu::vector<std::pair<train_id, train_information>> v = advanced_information.find(train_satisfied[0].first.second.begin.id, train_satisfied[0].first.second.begin.id);
-    train_information info_ = v[0].second;
+    sjtu::vector<std::pair<train_id, train_information>> v_ = advanced_information.find(train_satisfied[0].first.second.begin.id, train_satisfied[0].first.second.begin.id);
+    train_information info__ = v_[0].second;
     seat_ = 1e9;
     delta = day_.delta_day();
     for (int j = train_satisfied[0].first.second.index_begin; j < train_satisfied[0].first.second.index_end; j++) {
-        seat_ = std::min(seat_, info_.seat_num[j][delta]);
+        seat_ = std::min(seat_, info__.seat_num[j][delta]);
     }
     std::cout << seat_ << std::endl;
     return;

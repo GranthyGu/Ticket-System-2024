@@ -1,10 +1,68 @@
-// Created by GranthyGu on 2025/5/8
+// // Created by GranthyGu on 2025/5/8
 
-#include "token_scanner.hpp"
-#include "STL/vector.hpp"
+// #include "token_scanner.hpp"
+// #include "STL/vector.hpp"
+// #include "b_plus_tree.hpp"
+// #include "ticket_management.hpp"
+// #include "account_management.hpp"
+// #include "train_management.hpp"
+
+// int main() {
+//     B_plus_tree<username, int, 100, 100> h;
+//     h.set_file_name("111");
+//     h.insert(username("114514"), 10);
+//     sjtu::vector<std::pair<username, int>> r = h.find(username("114514"), username("114514"));
+//     std::cout << r[0].second << std::endl;
+//     // freopen("in.txt", "r", stdin);   // 读入in.dat文件作为输入 
+// 	// freopen("out.dat", "w", stdout);  // 将输入写入out.dat文件中 
+//     // train_management train;
+//     // account_management account;
+//     // ticket_management ticket;
+//     // while (true) {
+//     //     std::string order;
+//     //     if (!getline(std::cin, order)) {
+//     //         break;
+//     //     }
+//     //     token_scanner ts(order);
+//     //     if (ts.operation == "add_user") {
+//     //         account.add_user(ts);
+//     //     } else if (ts.operation == "login") {
+//     //         account.log_in(ts);
+//     //     } else if (ts.operation == "logout") {
+//     //         account.log_out(ts);
+//     //     } else if (ts.operation == "query_profile") {
+//     //         account.query_profile(ts);
+//     //     } else if (ts.operation == "modify_profile") {
+//     //         account.modify_profile(ts);
+//     //     } else if (ts.operation == "add_train") {
+//     //         train.add_train(ts);
+//     //     } else if (ts.operation == "delete_train") {
+//     //         train.delete_train(ts);
+//     //     } else if (ts.operation == "release_train") {
+//     //         train.release_train(ts);
+//     //     } else if (ts.operation == "query_train") {
+//     //         train.query_train(ts);
+//     //     } else if (ts.operation == "query_ticket") {
+//     //         train.query_ticket(ts);
+//     //     } else if (ts.operation == "query_transfer") {
+//     //         train.query_transfer(ts);
+//     //     } else if (ts.operation == "buy_ticket") {
+//     //         ticket.buy_ticket(ts);
+//     //     } else if (ts.operation == "query_order") {
+//     //         ticket.query_order(ts);
+//     //     } else if (ts.operation == "refund_ticket") {
+//     //         ticket.refund_ticket(ts);
+//     //     } else if (ts.operation == "clean") {
+//     //         ticket.clear();
+//     //     } else if (ts.operation == "exit") {
+//     //         ticket.exit();
+//     //         account.exit();
+//     //         train.exit();
+//     //     }
+//     // }
+// }
 #include "b_plus_tree.hpp"
-#include <string>
-#include <iostream>
+
 class key_value {
 public:
     char key[65] = {};
@@ -56,7 +114,7 @@ public:
 int main() {
     int n;
     std::cin >> n;
-    B_plus_tree<key_value, key_value, 51, 28> bpt("File_for_bpt");
+    B_plus_tree<key_value, key_value, 52, 26> bpt("File_for_bpt");
     for (int i = 0; i < n; i++) {
         std::string operation;
         std::cin >> operation;
@@ -77,8 +135,8 @@ int main() {
         if (operation == "find") {
             std::string key;
             std::cin >> key;
-            key_value minimal(key, 5);
-            key_value maximal(key, 5);
+            key_value minimal(key, INT_MIN);
+            key_value maximal(key, INT_MAX);
             sjtu::vector<std::pair<key_value, key_value>> tmp = bpt.find(minimal, maximal);
             if (tmp.size() == 0) {
                 std::cout << "null" << std::endl;

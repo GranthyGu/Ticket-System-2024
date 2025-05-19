@@ -570,7 +570,9 @@ private:
         }
         return true;
     }
+    int size_ = 0;
 public:
+    B_plus_tree() {}
     B_plus_tree(std::string str) : file_name(str), address_of_root(0) {
         File.open(file_name, std::ios::in | std::ios::out | std::ios::binary);
         if (!File) {
@@ -588,23 +590,86 @@ public:
             File.seekp(0);
             initial.write_to_file(File);
             initial_leaf.address_of_parent = 0;
+            File.seekp(initial.address_of_children[0]);
             initial_leaf.write_to_file(File);
         } else {
             long address_before;
+            int size_before;
             File.seekg(0, std::ios::end);
             long final_pos = File.tellg();
-            File.seekg(final_pos - sizeof(long));
+            File.seekg(final_pos - sizeof(long) - sizeof(int));
             File.read(reinterpret_cast<char*> (&address_before), sizeof(long));
+            File.seekg(final_pos - sizeof(int));
+            File.read(reinterpret_cast<char*> (&size_before), sizeof(int));
             address_of_root = address_before;
+            size_ = size_before;
         }
+    }
+    void set_file_name(std::string str) {
+        address_of_root = 0;
+        file_name = str;
+        File.open(file_name, std::ios::in | std::ios::out | std::ios::binary);
+        if (!File) {
+            File.clear();
+            File.open(file_name, std::ios::out | std::ios::binary);
+            File.close();
+            File.clear();
+            File.open(file_name, std::ios::in | std::ios::out | std::ios::binary);
+            Node<T, M, L> initial;
+            initial.is_leaf = 1;
+            leaf_Node<T, V, M, L> initial_leaf;
+            File.seekp(0);
+            initial.write_to_file(File);
+            initial.address_of_children[0] = File.tellp();
+            File.seekp(0);
+            initial.write_to_file(File);
+            initial_leaf.address_of_parent = 0;
+            File.seekp(initial.address_of_children[0]);
+            initial_leaf.write_to_file(File);
+        } else {
+            long address_before;
+            int size_before;
+            File.seekg(0, std::ios::end);
+            long final_pos = File.tellg();
+            File.seekg(final_pos - sizeof(long) - sizeof(int));
+            File.read(reinterpret_cast<char*> (&address_before), sizeof(long));
+            File.seekg(final_pos - sizeof(int));
+            File.read(reinterpret_cast<char*> (&size_before), sizeof(int));
+            address_of_root = address_before;
+            size_ = size_before;
+        }
+    }
+    bool empty() {
+        File.seekg(address_of_root);
+        Node<T, M, L> node;
+        node.read_from_file(File);
+        if (node.is_leaf == 1 && node.size == 0) {
+            leaf_Node<T, V, M, L> leaf;
+            File.seekg(node.address_of_children[0]);
+            leaf.read_from_file(File);
+            return (leaf.size == 0) && (size_ == 0);
+        } else {
+            return false;
+        }
+    }
+    ~B_plus_tree() {
+        put_root();
     }
     bool insert(const T& key, const V& value) {
         long address = find_corresponding_leaf(key);
-        return insert_to_bpt(address, key, value);
+        if (insert_to_bpt(address, key, value)) {
+            size_++;
+            return true;
+        }
+        return false;
     }
     bool remove(const T& value) {
         long address = find_corresponding_leaf(value);
-        return delete_the_node(address, value);
+        if (delete_the_node(address, value)) {
+            size_--;
+            return true;
+        }
+        return false;
     }
     sjtu::vector<std::pair<T, V>> find(const T& minimal, const T& maximal) {
         sjtu::vector<std::pair<T, V>> values;
@@ -616,7 +681,7 @@ public:
         while (index < node.size && node.key[index] < minimal) {index++;}
         while (true) {
             while (index < node.size && (node.key[index] < maximal || node.key[index] == maximal)) {
-                values.push_back({node.key[index], node.key[index]});
+                values.push_back(std::make_pair(node.key[index], node.value[index]));
                 index++;
             }
             if (node.address_of_right_node == -1 || node.key[node.size - 1] > maximal) {
@@ -631,7 +696,26 @@ public:
     void put_root() {
         File.seekp(0, std::ios::end);
         File.write(reinterpret_cast<char*> (&address_of_root), sizeof(long));
+        File.seekp(0, std::ios::end);
+        File.write(reinterpret_cast<char*> (&size_), sizeof(int));
         return;
+    }
+    int size() {return size_;}
+    void clear() {
+        size_ = 0;
+        address_of_root = 0;
+        File.clear();
+        File.open(file_name, std::ios::in | std::ios::out | std::ios::binary);
+        Node<T, M, L> initial;
+        initial.is_leaf = 1;
+        leaf_Node<T, V, M, L> initial_leaf;
+        File.seekp(0);
+        initial.write_to_file(File);
+        initial.address_of_children[0] = File.tellp();
+        File.seekp(0);
+        initial.write_to_file(File);
+        initial_leaf.address_of_parent = 0;
+        initial_leaf.write_to_file(File);
     }
 };
 

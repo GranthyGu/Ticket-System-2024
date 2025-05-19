@@ -54,6 +54,7 @@
         "map": "cpp",
         "queue": "cpp",
         "print": "cpp",
-        "stack": "cpp"
+        "stack": "cpp",
+        "climits": "cpp"
     }
 }

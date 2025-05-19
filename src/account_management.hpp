@@ -43,6 +43,14 @@ public:
     mail_address operator=(const mail_address&);
 };
 
+class privilege {
+public:
+    int p;
+    privilege();
+    privilege(std::string);
+    privilege operator=(const privilege&);
+};
+
 class account_management {
 private:
     B_plus_tree<username, password, 142, 80> username_password_tree;

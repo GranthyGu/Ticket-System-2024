@@ -69,6 +69,7 @@ info_for_ticket info_for_ticket::operator=(const info_for_ticket& other) {
         to[i] = other.to[i];
     }
     num = other.num;
+    return *this;
 }
 
 key_for_ticket_user::key_for_ticket_user() {}
@@ -133,7 +134,7 @@ info_for_ticket_user info_for_ticket_user::operator=(const info_for_ticket_user&
     }
     num = other.num;
     statu = other.statu;
-
+    return *this;
 }
 
 ticket_management::ticket_management() {

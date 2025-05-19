@@ -12,6 +12,7 @@ username username::operator=(const username& other) {
     for (int i = 0; i < 20; i++) {
         username_[i] = other.username_[i];
     }
+    return *this;
 }
 bool username::operator<(const username& other) {
     for (int i = 0; i < 20; i++) {
@@ -48,6 +49,7 @@ password password::operator=(const password& other) {
     for (int i = 0; i < 30; i++) {
         password_[i] = other.password_[i];
     }
+    return *this;
 }
 
 name::name() {}
@@ -60,6 +62,7 @@ name name::operator=(const name& other) {
     for (int i = 0; i < 20; i++) {
         name_[i] = other.name_[i];
     }
+    return *this;
 }
 
 mail_address::mail_address() {}
@@ -72,6 +75,7 @@ mail_address mail_address::operator=(const mail_address& other) {
     for (int i = 0; i < 30; i++) {
         mail_address_[i] = other.mail_address_[i];
     }
+    return *this;
 }
 
 account_management::account_management() {
