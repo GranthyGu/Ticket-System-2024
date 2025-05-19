@@ -24,7 +24,7 @@ Time Time::operator=(const Time& other) {
     minute = other.minute;
     return *this;
 }
-bool Time::operator<(const Time& other) {
+bool Time::operator<(const Time& other) const {
     if (day != other.day) {
         return day < other.day;
     }
@@ -33,7 +33,7 @@ bool Time::operator<(const Time& other) {
     }
     return minute < other.minute;
 }
-bool Time::operator>(const Time& other) {
+bool Time::operator>(const Time& other) const {
     if (day != other.day) {
         return day > other.day;
     }
@@ -97,22 +97,22 @@ date date::operator=(const date& other) {
     day = other.day;
     return *this;
 }
-bool date::operator<(const date& other) {
+bool date::operator<(const date& other) const {
     if (month != other.month) {
         return month < other.month;
     }
     return day < other.day;
 }
-bool date::operator>(const date& other) {
+bool date::operator>(const date& other) const {
     if (month != other.month) {
         return month > other.month;
     }
     return day > other.day;
 }
-bool date::operator!=(const date& other) {
+bool date::operator!=(const date& other) const {
     return (month != other.month) || (day != other.day);
 }
-bool date::operator==(const date& other) {
+bool date::operator==(const date& other) const {
     return (month == other.month) && (day == other.day);
 }
 void date::add_day(int d) {

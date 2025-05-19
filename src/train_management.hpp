@@ -56,6 +56,7 @@ public:
     Time time_leave;
     station();
     station(std::string, std::string, Time, Time);
+    station(std::string, train_id, Time, Time);
     station operator=(const station&);
     bool operator<(const station&) const;
     bool operator>(const station&) const;
@@ -76,7 +77,8 @@ private:
     B_plus_tree<train_id, information, 100, 100> basic_information;
     B_plus_tree<train_id, train_information, 100, 100> advanced_information;
     B_plus_tree<station, std::pair<int, int>, 100, 100> released_station_train_id_list;
-    sjtu::map<std::string, std::string> station_name;
+    B_plus_tree<int, station, 100, 100> station_name;
+    int num = 1;
     sjtu::vector<temp> query_ticket_(std::string, std::string, date);
     sjtu::vector<std::pair<temp, int>> query_ticket__(std::string, std::string, date, Time time);
 public:
@@ -87,6 +89,10 @@ public:
     void query_train(const token_scanner&);
     void query_ticket(const token_scanner&);
     void query_transfer(const token_scanner&);
+    void refund_ticket(const train_id&, std::string, std::string, date, int);
+    std::pair<date, int> query_buy(std::string, std::string, date, train_id, int, bool);
+    std::pair<Time, Time> query_time(const train_id&, std::string);
+    int query_price(const train_id&, std::string, std::string);
 };
 
 #endif    //TRAIN_MANAGEMENT_HPP

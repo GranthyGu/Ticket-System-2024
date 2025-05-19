@@ -172,7 +172,7 @@ void account_management::log_in(const token_scanner& ts) {
     sjtu::vector<std::pair<username, int>> 
         find_result_ = username_privilege_tree.find(username(username_), username(username_));
     log_in_stack.push_back(std::make_pair(username(username_), find_result_[0].second));
-    std::cout << '[' << ts.time << ']' << ' ' << 0 << std::endl;
+    std::cout << '[' <<  ts.time << ']' << ' ' << 0 << std::endl;
     return;
 }
 void account_management::log_out(const token_scanner& ts) {
@@ -308,4 +308,13 @@ void account_management::modify_profile(const token_scanner& ts) {
         << ' ' << username_mail_address_tree.find(username(username_), username(username_))[0].second.mail_address_
         << ' ' << username_privilege_tree.find(username(username_), username(username_))[0].second << std::endl;
     return;
+}
+bool account_management::log_in_statu(const username& id) {
+    for (int i = 0; i < log_in_stack.size(); i++) {
+        username temp = log_in_stack[i].first;
+        if (temp == id) {
+            return true;
+        }
+    }
+    return false;
 }

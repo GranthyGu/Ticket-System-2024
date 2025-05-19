@@ -679,8 +679,8 @@ int main() {
         if (operation == "find") {
             std::string key;
             std::cin >> key;
-            key_value minimal(key, INT_MIN);
-            key_value maximal(key, INT_MAX);
+            key_value minimal(key, 5);
+            key_value maximal(key, 5);
             sjtu::vector<key_value> tmp = bpt.find(minimal, maximal);
             if (tmp.size() == 0) {
                 std::cout << "null" << std::endl;
