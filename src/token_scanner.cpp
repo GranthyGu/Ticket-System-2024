@@ -11,7 +11,7 @@ token_scanner::token_scanner(const std::string& input) {
     }
     time = std::stoi(time_);
     idx += 2;
-    while (input[idx] != ' ') {
+    while (input[idx] != ' ' && idx < input.size()) {
         operation += input[idx];
         idx++;
     }
