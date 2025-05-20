@@ -26,9 +26,9 @@ public:
 class info_for_ticket {
 public:
     date date_;
-    char user_name[20];
-    char from[30];
-    char to[30];
+    char user_name[20] = {0};
+    char from[30] = {0};
+    char to[30] = {0};
     int num;
     info_for_ticket();
     info_for_ticket(std::string, std::string, std::string, std::string, std::string);
@@ -38,7 +38,7 @@ public:
 class key_for_ticket_user {
 public:
     int time_;
-    char user_name[20];
+    char user_name[20] = {0};
     key_for_ticket_user();
     key_for_ticket_user(int, std::string);
     key_for_ticket_user operator=(const key_for_ticket_user&);
@@ -51,8 +51,8 @@ class info_for_ticket_user {
 public:
     train_id id;
     date date_;
-    char from[30];
-    char to[30];
+    char from[30] = {0};
+    char to[30] = {0};
     int num;
     int statu = 1;      // 1->success, 2->pending, 3->refunded
     info_for_ticket_user();
@@ -75,6 +75,8 @@ public:
     void refund_ticket(const token_scanner&);
     void exit();
     void clear();
+    void log_in_for_account(const token_scanner&);
+    void log_out_for_account(const token_scanner&);
 };
 
 #endif      // TICKET_MANAGEMENT_HPP

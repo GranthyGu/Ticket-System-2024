@@ -302,3 +302,24 @@ void ticket_management::clear() {
     standby_by_train_date.clear();
     ticket_list_by_user.clear();
 }
+void ticket_management::log_in_for_account(const token_scanner& ts) {
+    std::string username_, password_;
+    for (int i = 0; i < ts.key_argument.size(); i++) {
+        if (ts.key_argument[i].first == 'u') {
+            username_ = ts.key_argument[i].second;
+        } else if (ts.key_argument[i].first == 'p') {
+            password_ = ts.key_argument[i].second;
+        }
+    }
+    account_manage.log_in_stack.push_back(std::make_pair(username(username_), 1));
+    return;
+}
+void ticket_management::log_out_for_account(const token_scanner& ts) {
+    std::string username_ = ts.key_argument[0].second;
+    for (int i = 0; i < account_manage.log_in_stack.size(); i++) {
+        if (std::string(account_manage.log_in_stack[i].first.username_) == username_) {
+            account_manage.log_in_stack.erase(i);
+            return;
+        }
+    }
+}

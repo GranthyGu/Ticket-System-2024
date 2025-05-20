@@ -13,7 +13,7 @@
 
 class train_id {
 public:
-    char id[20];
+    char id[20] = {0};
     train_id();
     train_id(std::string);
     train_id operator=(const train_id&);
@@ -26,7 +26,7 @@ class information {
 public:
     int station_num;
     char type;
-    char stations[3005] = {0};
+    char stations[100][30] = {0};
     date sale_date_begin;
     date sale_date_end;
     int prices[100] = {0};    // prefix_sum
@@ -38,11 +38,11 @@ public:
 
 class train_information{
 public:
+    int released = 0;
     int seat_num[100][92];
     Time start_time;
     Time arriving_time[100];   // arriving_time[i] saves the time to the ith station.
     Time leaving_time[100];    // leaving_time[i] saves the time leave the ith station.
-    bool released = false;
     train_information();
     train_information(std::string, std::string, std::string, std::string);
     train_information operator=(const train_information&);
@@ -50,7 +50,7 @@ public:
 
 class station {
 public:
-    char station_name[30];
+    char station_name[30] = {0};
     train_id id;
     Time time_arrival;
     Time time_leave;
@@ -74,8 +74,8 @@ struct temp {
 
 class train_management {
 private:
-    B_plus_tree<train_id, information, 100, 100> basic_information;
-    B_plus_tree<train_id, train_information, 100, 100> advanced_information;
+    B_plus_tree<train_id, information, 100, 3> basic_information;
+    B_plus_tree<train_id, train_information, 100, 2> advanced_information;
     B_plus_tree<station, std::pair<int, int>, 100, 100> released_station_train_id_list;
     B_plus_tree<int, station, 100, 100> station_name;
     int num = 1;

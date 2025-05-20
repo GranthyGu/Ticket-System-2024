@@ -10,7 +10,7 @@
 
 class username {
 public:
-    char username_[20];
+    char username_[20] = {0};
     username();
     username(std::string);
     username operator=(const username&);
@@ -21,7 +21,7 @@ public:
 
 class password {
 public:
-    char password_[30];
+    char password_[30] = {0};
     password();
     password(std::string);
     password operator=(const password&);
@@ -29,7 +29,7 @@ public:
 
 class name {
 public:
-    char name_[20];
+    char name_[20] = {0};
     name();
     name(std::string);
     name operator=(const name&);
@@ -37,18 +37,10 @@ public:
 
 class mail_address {
 public:
-    char mail_address_[30];
+    char mail_address_[30] = {0};
     mail_address();
     mail_address(std::string);
     mail_address operator=(const mail_address&);
-};
-
-class privilege {
-public:
-    int p;
-    privilege();
-    privilege(std::string);
-    privilege operator=(const privilege&);
 };
 
 class account_management {
@@ -61,8 +53,8 @@ public:
     sjtu::vector<std::pair<username,int>> log_in_stack;
     account_management();
     void add_user(const token_scanner&);
-    void log_in(const token_scanner&);
-    void log_out(const token_scanner&);
+    bool log_in(const token_scanner&);
+    bool log_out(const token_scanner&);
     void query_profile(const token_scanner&);
     void modify_profile(const token_scanner&);
     bool log_in_statu(const username&);

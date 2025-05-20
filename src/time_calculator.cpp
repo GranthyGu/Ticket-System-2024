@@ -49,7 +49,7 @@ void Time::add_minute(int m) {
     int day_ = (hour + h) / 24;
     int hh = (hour + h) % 24;
     hour = hh;
-    day = day_;
+    day += day_;
 }
 std::string Time::to_string() {
     std::string time_;

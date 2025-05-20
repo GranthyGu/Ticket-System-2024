@@ -91,7 +91,7 @@ public:
         this->size = other.size;
         this->address_of_right_node = other.address_of_right_node;
         this->address_of_parent = other.address_of_parent;
-        for (int i = 0; i < L; i++) {
+        for (int i = 0; i <= L; i++) {
             this->key[i] = other.key[i];
             this->value[i] = other.value[i];
         }
@@ -101,7 +101,7 @@ public:
         if (!File) {return;}
         File.write(reinterpret_cast<char*> (&size), sizeof(int));
         File.write(reinterpret_cast<char*> (key), (L + 1)* sizeof(T));
-        File.write(reinterpret_cast<char*> (value), (L + 1)* sizeof(T));
+        File.write(reinterpret_cast<char*> (value), (L + 1)* sizeof(V));
         File.write(reinterpret_cast<char*> (&address_of_right_node), sizeof(long));
         File.write(reinterpret_cast<char*> (&address_of_parent), sizeof(long));
     }
@@ -109,7 +109,7 @@ public:
         if (!File) {return;}
         File.read(reinterpret_cast<char*> (&size), sizeof(int));
         File.read(reinterpret_cast<char*> (key), (L + 1) * sizeof(T));
-        File.read(reinterpret_cast<char*> (value), (L + 1) * sizeof(T));
+        File.read(reinterpret_cast<char*> (value), (L + 1) * sizeof(V));
         File.read(reinterpret_cast<char*> (&address_of_right_node), sizeof(long));
         File.read(reinterpret_cast<char*> (&address_of_parent), sizeof(long));
     }
@@ -506,11 +506,11 @@ private:
                 return;
             }
         }
-        if (parent.size < (M - 1) / 2 && address != address_of_root) {
+        if (parent.size < (M - 1) / 2 && address != address_of_root && parent.address_of_parent != -1) {
             Node<T, M, L> parent_parent;
             File.seekg(parent.address_of_parent);
             parent_parent.read_from_file(File);
-            int index;
+            int index = -1;
             for (int i = 0; i <= parent_parent.size; i++) {
                 if (parent_parent.address_of_children[i] == address) {
                     index = i;
@@ -558,7 +558,7 @@ private:
             Node<T, M, L> parent_parent;
             File.seekg(node.address_of_parent);
             parent_parent.read_from_file(File);
-            int index;
+            int index = -1;
             for (int i = 0; i <= parent_parent.size; i++) {
                 if (parent_parent.address_of_children[i] == address) {
                     index = i;
@@ -681,7 +681,7 @@ public:
         while (index < node.size && node.key[index] < minimal) {index++;}
         while (true) {
             while (index < node.size && (node.key[index] < maximal || node.key[index] == maximal)) {
-                values.push_back(std::make_pair(node.key[index], node.value[index]));
+                values.push_back({node.key[index], node.value[index]});
                 index++;
             }
             if (node.address_of_right_node == -1 || node.key[node.size - 1] > maximal) {

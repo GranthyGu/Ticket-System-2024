@@ -91,8 +91,14 @@ bool station::operator==(const station& other) const {
     return id == other.id;
 }
 
-information::information() {}
-information::information(std::string num, std::string type_, std::string stations,
+information::information() {
+    for (int i = 0; i < 100; i++) {
+        for (int j = 0; j < 30; j++) {
+            stations[i][j] = 0;
+        }
+    }
+}
+information::information(std::string num, std::string type_, std::string stations_,
                          std::string sale_date, std::string price) {
     station_num = std::stoi(num);
     type = type_[0];
@@ -108,33 +114,33 @@ information::information(std::string num, std::string type_, std::string station
     sale_date_end = end_;
     std::string temp;
     int flag = 0;
-    for (int i = 0; i < stations.size(); i++) {
-        if (stations[i] != '|') {
-            temp += stations[i];
+    for (int i = 0; i < stations_.size(); i++) {
+        if (stations_[i] != '|') {
+            temp += stations_[i];
         } else {
-            for (int j = flag * 30; j < flag * 30 + temp.size(); j++) {
-                stations[j] = temp[j - flag * 30];
+            for (int j = 0; j < temp.size(); j++) {
+                stations[flag][j] = temp[j];
             }
             flag++;
             temp.clear();
         }
     }
-    for (int j = flag * 30; j < flag * 30 + temp.size(); j++) {
-        stations[j] = temp[j - flag * 30];
+    for (int j = 0; j < temp.size(); j++) {
+        stations[flag][j] = temp[j];
     }
-    temp.clear();
+    std::string temp_;
     sjtu::vector<int> prices_;
     for (int i = 0; i < price.size(); i++) {
-        if (stations[i] != '|') {
-            temp += price[i];
+        if (price[i] != '|') {
+            temp_ += price[i];
         } else {
-            prices_.push_back(std::stoi(temp));
-            temp.clear();
+            prices_.push_back(std::stoi(temp_));
+            temp_.clear();
         }
     }
-    prices_.push_back(std::stoi(temp));
+    prices_.push_back(std::stoi(temp_));
     for (int i = 1; i <= prices_.size(); i++) {
-        prices[i] = prices[i - 1] + prices_[i];
+        prices[i] = prices[i - 1] + prices_[i - 1];
     }
 }
 information information::operator=(const information& other) {
@@ -145,22 +151,17 @@ information information::operator=(const information& other) {
     for (int i = 0; i < 100; i++) {
         prices[i] = other.prices[i];
     }
-    for (int i = 0; i < 3005; i++) {
-        stations[i] = other.stations[i];
+    for (int i = 0; i < 100; i++) {
+        for (int j = 0; j < 30; j++) {
+            stations[i][j] = other.stations[i][j];
+        }
     }
     return *this;
 }
 sjtu::vector<std::string> information::get_stations() {
     sjtu::vector<std::string> v;
     for (int i = 0; i < station_num; i++) {
-        std::string temp;
-        for (int j = 30 * i; j < 30 * (i + 1); i++) {
-            if (stations[j] != '\0') {
-                temp += stations[j];
-            } else {
-                break;
-            }
-        }
+        std::string temp(stations[i]);
         v.push_back(temp);
     }
     return v;
@@ -219,6 +220,7 @@ train_information train_information::operator=(const train_information& other) {
         leaving_time[i] = other.leaving_time[i];
     }
     start_time = other.start_time;
+    released = other.released;
     return *this;
 }
 
@@ -272,7 +274,7 @@ void train_management::delete_train(const token_scanner& ts) {
     std::string ID = ts.key_argument[0].second;
     train_id id(ID);
     sjtu::vector<std::pair<train_id, train_information>> v = advanced_information.find(id, id);
-    if (v.empty() || v[0].second.released) {
+    if (v.empty() || v[0].second.released == 1) {
         std::cout << '[' << ts.time << ']' << ' ' << -1 << std::endl;
         return;
     }
@@ -284,14 +286,14 @@ void train_management::release_train(const token_scanner& ts) {
     train_id id(ID);
     sjtu::vector<std::pair<train_id, train_information>> v = advanced_information.find(id, id);
     sjtu::vector<std::pair<train_id, information>> v_ = basic_information.find(id, id);
-    if (v.empty() || v[0].second.released) {
+    if (v.empty() || v[0].second.released == 1) {
         std::cout << '[' << ts.time << ']' << ' ' << -1 << std::endl;
         return;
     }
     information info = v_[0].second;
     train_information info_ = v[0].second;
     advanced_information.remove(id);
-    info_.released = true;
+    info_.released = 1;
     advanced_information.insert(id, info_);
     sjtu::vector<std::string> station_info = info.get_stations();
     for (int i = 0; i < station_info.size(); i++) {
@@ -331,7 +333,7 @@ void train_management::query_train(const token_scanner& ts) {
     for (int i = 0; i < info.station_num; i++) {
         std::cout << stations_info[i] << ' ';
         if (i == 0) {
-            std::cout << "xx-xx xx:xx ";
+            std::cout << "xx-xx xx:xx -> ";
         } else {
             Time t = info_.arriving_time[i];
             date day_ = date_of_train;
@@ -410,7 +412,7 @@ void quick_sort(sjtu::vector<T> &v, int left, int right, Compare cmp) {
     T pivot = v[left];
     int i = left, j = right;
     while (i < j) {
-        while (i < j && cmp(v[j], pivot)) j--;
+        while (i < j && !cmp(v[j], pivot)) j--;
         while (i < j && cmp(v[i], pivot)) i++;
         if (i < j) std::swap(v[i], v[j]);
     }
@@ -546,7 +548,7 @@ void train_management::query_ticket(const token_scanner& ts) {
         std::cout << day.to_string() << ' ' << train_satisfied[i].begin.time_leave.to_string() 
                   << " -> " << train_satisfied[i].end.station_name << ' ';
         day.add_day(train_satisfied[i].end.time_arrival.day - train_satisfied[i].begin.time_arrival.day);
-        std::cout << day.to_string() << ' ' << train_satisfied[i].end.time_arrival.to_string() << train_satisfied[i].price << ' ';
+        std::cout << day.to_string() << ' ' << train_satisfied[i].end.time_arrival.to_string() << ' ' << train_satisfied[i].price << ' ';
         sjtu::vector<std::pair<train_id, train_information>> v = advanced_information.find(train_satisfied[i].begin.id, train_satisfied[i].begin.id);
         train_information info_ = v[0].second;
         int seat_ = 1e9;
@@ -597,6 +599,7 @@ void train_management::query_transfer(const token_scanner& ts) {
     }
     if (train_satisfied.size() == 0) {
         std::cout << '[' << ts.time << ']' << ' ' << 0 << std::endl;
+        return;
     }
     if (sort_ == "time") {
         sort_by_time_transfer(train_satisfied);
@@ -662,11 +665,11 @@ std::pair<date, int> train_management::query_buy(std::string start, std::string 
     int delta_date = date_.delta_day();
     sjtu::vector<std::pair<train_id, train_information>> find_result = advanced_information.find(id, id);
     int minimal = 1e9;
-    for (int i = start_train[0].second.first; i <= end_train[0].second.first; i++) {
+    for (int i = start_train[0].second.first; i < end_train[0].second.first; i++) {
         minimal = std::min(minimal, find_result[0].second.seat_num[i][delta_date]);
     }
     if (minimal >= num){
-        for (int i = start_train[0].second.first; i <= end_train[0].second.first; i++) {
+        for (int i = start_train[0].second.first; i < end_train[0].second.first; i++) {
             find_result[0].second.seat_num[i][delta_date] -= num;
         }
         advanced_information.remove(id);

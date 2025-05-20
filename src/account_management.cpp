@@ -143,11 +143,12 @@ void account_management::add_user(const token_scanner& ts) {
         username_name_tree.insert(username(username_), name(name_));
         username_mail_address_tree.insert(username(username_), mail_address(mail_address_));
         username_password_tree.insert(username(username_), password(password_));
+        sjtu::vector<std::pair<username, mail_address>> r = username_mail_address_tree.find(username(username_),username(username_));
         std::cout << '[' << ts.time << ']' << ' ' << 0 << std::endl;
         return;
     }
 }
-void account_management::log_in(const token_scanner& ts) {
+bool account_management::log_in(const token_scanner& ts) {
     std::string username_, password_;
     for (int i = 0; i < ts.key_argument.size(); i++) {
         if (ts.key_argument[i].first == 'u') {
@@ -159,37 +160,37 @@ void account_management::log_in(const token_scanner& ts) {
     for (int i = 0; i < log_in_stack.size(); i++) {
         if (std::string(log_in_stack[i].first.username_) == username_) {
             std::cout << '[' << ts.time << ']' << ' ' << -1 << std::endl;
-            return;
+            return false;
         }
     }
     sjtu::vector<std::pair<username, password>> 
         find_result = username_password_tree.find(username(username_), username(username_));
     if (find_result.empty()) {
         std::cout << '[' << ts.time << ']' << ' ' << -1 << std::endl;
-        return;
+        return false;
     }
     std::string pw(find_result[0].second.password_);
     if (pw != password_) {
         std::cout << '[' << ts.time << ']' << ' ' << -1 << std::endl;
-        return;
+        return false;
     }
     sjtu::vector<std::pair<username, int>> 
         find_result_ = username_privilege_tree.find(username(username_), username(username_));
     log_in_stack.push_back(std::make_pair(username(username_), find_result_[0].second));
     std::cout << '[' <<  ts.time << ']' << ' ' << 0 << std::endl;
-    return;
+    return true;
 }
-void account_management::log_out(const token_scanner& ts) {
+bool account_management::log_out(const token_scanner& ts) {
     std::string username_ = ts.key_argument[0].second;
     for (int i = 0; i < log_in_stack.size(); i++) {
         if (std::string(log_in_stack[i].first.username_) == username_) {
             log_in_stack.erase(i);
             std::cout << '[' << ts.time << ']' << ' ' << 0 << std::endl;
-            return;
+            return true;
         }
     }
     std::cout << '[' << ts.time << ']' << ' ' << -1 << std::endl;
-    return;
+    return false;
 }
 void account_management::query_profile(const token_scanner& ts) {
     std::string username_, cur_username;
@@ -274,7 +275,7 @@ void account_management::modify_profile(const token_scanner& ts) {
         std::cout << '[' << ts.time << ']' << ' ' << -1 << std::endl;
         return;
     }
-    if (std::stoi(privilege_) >= current_privilege) {
+    if (change_privilege && std::stoi(privilege_) >= current_privilege) {
         std::cout << '[' << ts.time << ']' << ' ' << -1 << std::endl;
         return;
     }
