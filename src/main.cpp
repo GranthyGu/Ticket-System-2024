@@ -59,6 +59,7 @@ int main() {
             account.exit();
             train.exit();
             std::cout << '[' << ts.time << ']' << " bye" << std::endl;
+            break;
         }
     }
 }
