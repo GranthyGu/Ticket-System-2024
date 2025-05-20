@@ -23,7 +23,7 @@ class token_scanner {
 public:
     int time;
     std::string operation;
-    sjtu::vector<std::pair<char, std::string>> key_argument;
+    sjtu::vector<std::pair<char, std::string> > key_argument;
     token_scanner(const std::string& input);
 };
 

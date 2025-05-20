@@ -671,8 +671,8 @@ public:
         }
         return false;
     }
-    sjtu::vector<std::pair<T, V>> find(const T& minimal, const T& maximal) {
-        sjtu::vector<std::pair<T, V>> values;
+    sjtu::vector<std::pair<T, V> > find(const T& minimal, const T& maximal) {
+        sjtu::vector<std::pair<T, V> > values;
         long address = find_corresponding_leaf(minimal);
         leaf_Node<T, V, M, L> node;
         File.seekg(address);

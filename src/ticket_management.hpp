@@ -37,7 +37,7 @@ public:
 
 class key_for_ticket_user {
 public:
-    int time_;
+    int time_ = 0;
     char user_name[20] = {0};
     key_for_ticket_user();
     key_for_ticket_user(int, std::string);
@@ -53,7 +53,7 @@ public:
     date date_;
     char from[30] = {0};
     char to[30] = {0};
-    int num;
+    int num = 0;
     int statu = 1;      // 1->success, 2->pending, 3->refunded
     info_for_ticket_user();
     info_for_ticket_user(std::string, std::string, std::string, std::string, std::string);
@@ -64,8 +64,8 @@ class ticket_management {
 private:
     train_management train_manage;
     account_management account_manage;
-    B_plus_tree<key_for_ticket, info_for_ticket, 100, 100> standby_by_train_date;
-    B_plus_tree<key_for_ticket_user, info_for_ticket_user, 100, 100> ticket_list_by_user;
+    B_plus_tree<key_for_ticket, info_for_ticket, 30, 30> standby_by_train_date;
+    B_plus_tree<key_for_ticket_user, info_for_ticket_user, 30, 30> ticket_list_by_user;
     std::pair<date, int> buy(const key_for_ticket_user&, const info_for_ticket_user&);
     std::pair<date, int> query_pending(const key_for_ticket&, const info_for_ticket&);
 public:
