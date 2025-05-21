@@ -230,7 +230,7 @@ public:
 	 * TODO Constructs
 	 * At least two: default constructor, copy constructor
 	 */
-	vector() : current_size(0), capacity(2) {
+	vector() : current_size(0), capacity(1) {
 		data = (T*) malloc(capacity * sizeof(T));
 	}
 	vector(const vector &other) : current_size(other.current_size), capacity(other.capacity) {

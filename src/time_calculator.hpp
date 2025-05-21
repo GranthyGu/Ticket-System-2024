@@ -8,8 +8,8 @@
 
 class Time {
 public:
-    int hour;
-    int minute;
+    int hour = 0;
+    int minute = 0;
     int day = 0;
     Time();
     Time(int, int);
@@ -23,8 +23,8 @@ public:
 };
 class date {
 public:
-    int month;
-    int day;
+    int month = 0;
+    int day = 0;
     date();
     date(int, int);
     date(std::string);

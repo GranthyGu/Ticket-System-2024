@@ -1,10 +1,7 @@
 // Created by GranthyGu on 2025/5/8
 
-#include "token_scanner.hpp"
-#include "STL/vector.hpp"
-#include "b_plus_tree.hpp"
-#include "ticket_management.hpp"
 #include "account_management.hpp"
+#include "ticket_management.hpp"
 #include "train_management.hpp"
 
 int main() {
@@ -15,9 +12,7 @@ int main() {
     ticket_management ticket;
     while (true) {
         std::string order;
-        if (!getline(std::cin, order)) {
-            break;
-        }
+        getline(std::cin, order);
         token_scanner ts(order);
         if (ts.operation == "add_user") {
             account.add_user(ts);
@@ -53,6 +48,7 @@ int main() {
             ticket.clear();
         } else if (ts.operation == "exit") {
             std::cout << '[' << ts.time << ']' << " bye" << std::endl;
+            break;
         }
     }
 }
