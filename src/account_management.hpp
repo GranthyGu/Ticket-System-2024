@@ -10,37 +10,37 @@
 
 class username {
 public:
-    char username_[20] = {0};
+    char username_[21] = {0};
     username();
     username(std::string);
-    username operator=(const username&);
-    bool operator<(const username&);
-    bool operator>(const username&);
-    bool operator==(const username&);
+    username& operator=(const username&);
+    bool operator<(const username&) const;
+    bool operator>(const username&) const;
+    bool operator==(const username&) const;
 };
 
 class password {
 public:
-    char password_[30] = {0};
+    char password_[31] = {0};
     password();
     password(std::string);
-    password operator=(const password&);
+    password& operator=(const password&);
 };
 
 class name {
 public:
-    char name_[20] = {0};
+    char name_[21] = {0};
     name();
     name(std::string);
-    name operator=(const name&);
+    name& operator=(const name&);
 };
 
 class mail_address {
 public:
-    char mail_address_[30] = {0};
+    char mail_address_[31] = {0};
     mail_address();
     mail_address(std::string);
-    mail_address operator=(const mail_address&);
+    mail_address& operator=(const mail_address&);
 };
 
 class account_management {

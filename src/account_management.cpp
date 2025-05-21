@@ -8,13 +8,13 @@ username::username(std::string str) {
         username_[i] = str[i];
     }
 }
-username username::operator=(const username& other) {
+username& username::operator=(const username& other) {
     for (int i = 0; i < 20; i++) {
         username_[i] = other.username_[i];
     }
     return *this;
 }
-bool username::operator<(const username& other) {
+bool username::operator<(const username& other) const{
     for (int i = 0; i < 20; i++) {
         if (username_[i] != other.username_[i]) {
             return (username_[i] < other.username_[i]);
@@ -22,7 +22,7 @@ bool username::operator<(const username& other) {
     }
     return false;
 }
-bool username::operator>(const username& other) {
+bool username::operator>(const username& other) const {
     for (int i = 0; i < 20; i++) {
         if (username_[i] != other.username_[i]) {
             return (username_[i] > other.username_[i]);
@@ -30,7 +30,7 @@ bool username::operator>(const username& other) {
     }
     return false;
 }
-bool username::operator==(const username& other) {
+bool username::operator==(const username& other) const {
     for (int i = 0; i < 20; i++) {
         if (username_[i] != other.username_[i]) {
             return false;
@@ -45,7 +45,7 @@ password::password(std::string str) {
         password_[i] = str[i];
     }
 }
-password password::operator=(const password& other) {
+password& password::operator=(const password& other) {
     for (int i = 0; i < 30; i++) {
         password_[i] = other.password_[i];
     }
@@ -58,7 +58,7 @@ name::name(std::string str) {
         name_[i] = str[i];
     }
 }
-name name::operator=(const name& other) {
+name& name::operator=(const name& other) {
     for (int i = 0; i < 20; i++) {
         name_[i] = other.name_[i];
     }
@@ -71,7 +71,7 @@ mail_address::mail_address(std::string str) {
         mail_address_[i] = str[i];
     }
 }
-mail_address mail_address::operator=(const mail_address& other) {
+mail_address& mail_address::operator=(const mail_address& other) {
     for (int i = 0; i < 30; i++) {
         mail_address_[i] = other.mail_address_[i];
     }
