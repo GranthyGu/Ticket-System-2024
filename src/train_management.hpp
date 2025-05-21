@@ -74,8 +74,8 @@ struct temp {
 
 class train_management {
 private:
-    B_plus_tree<train_id, information, 100, 20> basic_information;
-    B_plus_tree<train_id, train_information, 100, 20> advanced_information;
+    B_plus_tree<train_id, information, 100, 5> basic_information;
+    B_plus_tree<train_id, train_information, 100, 5> advanced_information;
     B_plus_tree<station, std::pair<int, int>, 100, 100> released_station_train_id_list;
     B_plus_tree<int, station, 100, 100> station_name;
     int num = 1;

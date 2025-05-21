@@ -302,24 +302,36 @@ void ticket_management::clear() {
     standby_by_train_date.clear();
     ticket_list_by_user.clear();
 }
-void ticket_management::log_in_for_account(const token_scanner& ts) {
-    std::string username_, password_;
-    for (int i = 0; i < ts.key_argument.size(); i++) {
-        if (ts.key_argument[i].first == 'u') {
-            username_ = ts.key_argument[i].second;
-        } else if (ts.key_argument[i].first == 'p') {
-            password_ = ts.key_argument[i].second;
-        }
-    }
-    account_manage.log_in_stack.push_back(std::make_pair(username(username_), 1));
-    return;
+void ticket_management::add_train_(const token_scanner& ts) {
+    train_manage.add_train(ts);
 }
-void ticket_management::log_out_for_account(const token_scanner& ts) {
-    std::string username_ = ts.key_argument[0].second;
-    for (int i = 0; i < account_manage.log_in_stack.size(); i++) {
-        if (std::string(account_manage.log_in_stack[i].first.username_) == username_) {
-            account_manage.log_in_stack.erase(i);
-            return;
-        }
-    }
+void ticket_management::delete_train_(const token_scanner& ts) {
+    train_manage.delete_train(ts);
+}
+void ticket_management::release_train_(const token_scanner& ts) {
+    train_manage.release_train(ts);
+}
+void ticket_management::query_train_(const token_scanner& ts) {
+    train_manage.query_train(ts);
+}
+void ticket_management::query_ticket_(const token_scanner& ts) {
+    train_manage.query_ticket(ts);
+}
+void ticket_management::query_transfer_(const token_scanner& ts) {
+    train_manage.query_transfer(ts);
+}
+void ticket_management::add_user_(const token_scanner& ts) {
+    account_manage.add_user(ts);
+}
+bool ticket_management::log_in_(const token_scanner& ts) {
+    account_manage.log_in(ts);
+}
+bool ticket_management::log_out_(const token_scanner& ts) {
+    account_manage.log_out(ts);
+}
+void ticket_management::query_profile_(const token_scanner& ts) {
+    account_manage.query_profile(ts);
+}
+void ticket_management::modify_profile_(const token_scanner& ts) {
+    account_manage.modify_profile(ts);
 }

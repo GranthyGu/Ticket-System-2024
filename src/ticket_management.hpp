@@ -75,8 +75,17 @@ public:
     void refund_ticket(const token_scanner&);
     void exit();
     void clear();
-    void log_in_for_account(const token_scanner&);
-    void log_out_for_account(const token_scanner&);
+    void add_train_(const token_scanner&);
+    void delete_train_(const token_scanner&);
+    void release_train_(const token_scanner&);
+    void query_train_(const token_scanner&);
+    void query_ticket_(const token_scanner&);
+    void query_transfer_(const token_scanner&);
+    void add_user_(const token_scanner&);
+    bool log_in_(const token_scanner&);
+    bool log_out_(const token_scanner&);
+    void query_profile_(const token_scanner&);
+    void modify_profile_(const token_scanner&);
 };
 
 #endif      // TICKET_MANAGEMENT_HPP

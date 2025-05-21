@@ -177,7 +177,7 @@ train_information::train_information(std::string str1, std::string str2, std::st
     }
     Time start(str2);
     start_time = start;
-    std::vector<int> arrive, leave;
+    sjtu::vector<int> arrive, leave;
     std::string temp;
     for (int i = 0; i < str3.size(); i++) {
         if (str3[i] != '|') {
