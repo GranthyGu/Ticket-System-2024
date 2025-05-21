@@ -324,10 +324,10 @@ void ticket_management::add_user_(const token_scanner& ts) {
     account_manage.add_user(ts);
 }
 bool ticket_management::log_in_(const token_scanner& ts) {
-    account_manage.log_in(ts);
+    return account_manage.log_in(ts);
 }
 bool ticket_management::log_out_(const token_scanner& ts) {
-    account_manage.log_out(ts);
+    return account_manage.log_out(ts);
 }
 void ticket_management::query_profile_(const token_scanner& ts) {
     account_manage.query_profile(ts);
