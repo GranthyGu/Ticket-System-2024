@@ -81,7 +81,7 @@ public:
     long address_of_parent;
     long address_of_right_node;
     leaf_Node() : size(0), address_of_right_node(-1), address_of_parent(-1) {}
-    leaf_Node(int size, T* key_, V* value_, long* add, long add_, long add_parent) : size(size), address_of_right_node(add_), address_of_parent(add_parent) {
+    leaf_Node(int size, T* key_, V* value_, long* add__, long add_, long add_parent) : size(size), address_of_right_node(add_), address_of_parent(add_parent) {
         for (int i = 0; i <= L; i++) {
             key[i] = key_[i];
             value[i] = value_[i];
@@ -157,7 +157,7 @@ private:
             Node<T, M, L> parent_parent;
             File.seekg(parent.address_of_parent);
             parent_parent.read_from_file(File);
-            int index;
+            int index = 0;
             for (int i = 0; i <= parent_parent.size; i++) {
                 if (parent_parent.address_of_children[i] == address) {
                     index = i;
@@ -186,7 +186,7 @@ private:
                 Node<T, M, L> parent_parent;
                 File.seekg(parent.address_of_parent);
                 parent_parent.read_from_file(File);
-                int index;
+                int index = 0;
                 for (int i = 0; i <= parent_parent.size; i++) {
                     if (parent_parent.address_of_children[i] == address) {
                         index = i;

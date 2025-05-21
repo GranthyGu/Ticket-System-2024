@@ -3,33 +3,44 @@
 #include "token_scanner.hpp"
 
 token_scanner::token_scanner(const std::string& input) {
-    int idx = 1;
-    std::string time_;
-    while (input[idx] != ']') {
-        time_ += input[idx];
+    size_t idx = 0;
+        if (idx >= input.size() || input[idx] != '[') throw std::invalid_argument("Invalid input: missing '['");
         idx++;
-    }
-    time = std::stoi(time_);
-    idx += 2;
-    while (input[idx] != ' ' && idx < input.size()) {
-        operation += input[idx];
-        idx++;
-    }
-    idx++;
-    while (idx < input.length()) {
-        std::pair<char, std::string> key_argument_temp;
-        if (input[idx] == '-') {
-            idx++;
-            key_argument_temp.first = input[idx];
-            idx += 2;
+
+        std::string time_str;
+        while (idx < input.size() && input[idx] != ']') {
+            if (!std::isdigit(input[idx])) throw std::invalid_argument("Invalid time format");
+            time_str += input[idx++];
         }
-        std::string argument;
-        while (idx < input.length() && input[idx] != ' ') {
-            argument += input[idx];
-            idx++;
-        }
-        key_argument_temp.second = argument;
-        key_argument.push_back(key_argument_temp);
+        if (idx >= input.size() || input[idx] != ']') throw std::invalid_argument("Invalid input: missing ']'");
+        time = std::stoi(time_str);
         idx++;
-    }
+
+        // 跳过可能的空格
+        while (idx < input.size() && std::isspace(input[idx])) idx++;
+
+        // 解析操作名
+        while (idx < input.size() && !std::isspace(input[idx])) {
+            operation += input[idx++];
+        }
+
+        // 跳过空格
+        while (idx < input.size() && std::isspace(input[idx])) idx++;
+
+        // 解析参数 -x value
+        while (idx < input.size()) {
+            if (input[idx] != '-') throw std::invalid_argument("Invalid input: expected '-'");
+            idx++;
+
+            if (idx >= input.size() || !std::isalpha(input[idx])) throw std::invalid_argument("Expected key after '-'");
+            char key = input[idx++];
+            
+            while (idx < input.size() && std::isspace(input[idx])) idx++;
+            std::string value;
+            while (idx < input.size() && !std::isspace(input[idx])) {
+                value += input[idx++];
+            }
+            key_argument.push_back({key, value});
+            while (idx < input.size() && std::isspace(input[idx])) idx++;
+        }
 }
