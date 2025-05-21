@@ -16,7 +16,7 @@ public:
     char id[20] = {0};
     train_id();
     train_id(std::string);
-    train_id operator=(const train_id&);
+    train_id& operator=(const train_id&);
     bool operator<(const train_id&) const;
     bool operator>(const train_id&) const;
     bool operator==(const train_id&) const;
@@ -32,7 +32,7 @@ public:
     int prices[100] = {0};    // prefix_sum
     information();
     information(std::string, std::string, std::string, std::string, std::string);
-    information operator=(const information&);
+    information& operator=(const information&);
     sjtu::vector<std::string> get_stations();
 };
 
@@ -45,7 +45,7 @@ public:
     Time leaving_time[100];    // leaving_time[i] saves the time leave the ith station.
     train_information();
     train_information(std::string, std::string, std::string, std::string);
-    train_information operator=(const train_information&);
+    train_information& operator=(const train_information&);
 };
 
 class station {
@@ -57,7 +57,7 @@ public:
     station();
     station(std::string, std::string, Time, Time);
     station(std::string, train_id, Time, Time);
-    station operator=(const station&);
+    station& operator=(const station&);
     bool operator<(const station&) const;
     bool operator>(const station&) const;
     bool operator==(const station&) const;
@@ -74,8 +74,8 @@ struct temp {
 
 class train_management {
 private:
-    B_plus_tree<train_id, information, 100, 3> basic_information;
-    B_plus_tree<train_id, train_information, 100, 2> advanced_information;
+    B_plus_tree<train_id, information, 100, 5> basic_information;
+    B_plus_tree<train_id, train_information, 100, 7> advanced_information;
     B_plus_tree<station, std::pair<int, int>, 100, 100> released_station_train_id_list;
     B_plus_tree<int, station, 100, 100> station_name;
     int num = 1;

@@ -8,7 +8,7 @@ train_id::train_id(std::string str) {
         id[i] = str[i];
     }
 }
-train_id train_id::operator=(const train_id& other) {
+train_id& train_id::operator=(const train_id& other) {
     for (int i = 0; i < 20; i++) {
         id[i] = other.id[i];
     }
@@ -57,7 +57,7 @@ station::station(std::string str, train_id id_, Time t, Time t_) {
     time_arrival = t;
     time_leave = t_;
 }
-station station::operator=(const station& other) {
+station& station::operator=(const station& other) {
     for (int i = 0; i < 30; i++) {
         station_name[i] = other.station_name[i];
     }
@@ -143,7 +143,7 @@ information::information(std::string num, std::string type_, std::string station
         prices[i] = prices[i - 1] + prices_[i - 1];
     }
 }
-information information::operator=(const information& other) {
+information& information::operator=(const information& other) {
     station_num = other.station_num;
     type = other.type;
     sale_date_begin = other.sale_date_begin;
@@ -211,7 +211,7 @@ train_information::train_information(std::string str1, std::string str2, std::st
     start.add_minute(arrive[arrive.size() - 1]);
     arriving_time[arrive.size()] = start;
 }
-train_information train_information::operator=(const train_information& other) {
+train_information& train_information::operator=(const train_information& other) {
     for (int i = 0; i < 100; i++) {
         for (int j = 0; j < 92; j++) {
             seat_num[i][j] = other.seat_num[i][j];
@@ -280,6 +280,8 @@ void train_management::delete_train(const token_scanner& ts) {
     }
     basic_information.remove(id);
     advanced_information.remove(id);
+    std::cout << '[' << ts.time << ']' << ' ' << 0 << std::endl;
+    return;
 }
 void train_management::release_train(const token_scanner& ts) {
     std::string ID = ts.key_argument[0].second;

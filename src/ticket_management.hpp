@@ -17,7 +17,7 @@ public:
     date date_;
     key_for_ticket();
     key_for_ticket(int, std::string, std::string);
-    key_for_ticket operator=(const key_for_ticket&);
+    key_for_ticket& operator=(const key_for_ticket&);
     bool operator<(const key_for_ticket&) const;
     bool operator>(const key_for_ticket&) const;
     bool operator==(const key_for_ticket&) const;
@@ -32,7 +32,7 @@ public:
     int num;
     info_for_ticket();
     info_for_ticket(std::string, std::string, std::string, std::string, std::string);
-    info_for_ticket operator=(const info_for_ticket&);
+    info_for_ticket& operator=(const info_for_ticket&);
 };
 
 class key_for_ticket_user {
@@ -41,7 +41,7 @@ public:
     char user_name[20] = {0};
     key_for_ticket_user();
     key_for_ticket_user(int, std::string);
-    key_for_ticket_user operator=(const key_for_ticket_user&);
+    key_for_ticket_user& operator=(const key_for_ticket_user&);
     bool operator<(const key_for_ticket_user&) const;
     bool operator>(const key_for_ticket_user&) const;
     bool operator==(const key_for_ticket_user&) const;
@@ -57,7 +57,7 @@ public:
     int statu = 1;      // 1->success, 2->pending, 3->refunded
     info_for_ticket_user();
     info_for_ticket_user(std::string, std::string, std::string, std::string, std::string);
-    info_for_ticket_user operator=(const info_for_ticket_user&);
+    info_for_ticket_user& operator=(const info_for_ticket_user&);
 };
 
 class ticket_management {
