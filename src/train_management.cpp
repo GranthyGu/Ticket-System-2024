@@ -549,7 +549,7 @@ void train_management::query_ticket(const token_scanner& ts) {
         day_.minus_day(train_satisfied[i].begin.time_leave.day);
         std::cout << day.to_string() << ' ' << train_satisfied[i].begin.time_leave.to_string() 
                   << " -> " << train_satisfied[i].end.station_name << ' ';
-        day.add_day(train_satisfied[i].end.time_arrival.day - train_satisfied[i].begin.time_arrival.day);
+        day.add_day(train_satisfied[i].end.time_arrival.day - train_satisfied[i].begin.time_leave.day);
         std::cout << day.to_string() << ' ' << train_satisfied[i].end.time_arrival.to_string() << ' ' << train_satisfied[i].price << ' ';
         sjtu::vector<std::pair<train_id, train_information> > v = advanced_information.find(train_satisfied[i].begin.id, train_satisfied[i].begin.id);
         train_information info_ = v[0].second;

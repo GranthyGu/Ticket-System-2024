@@ -18,7 +18,7 @@ Time::Time(std::string str) {
     hour = std::stoi(h);
     minute = std::stoi(m);
 }
-Time Time::operator=(const Time& other) {
+Time& Time::operator=(const Time& other) {
     day = other.day;
     hour = other.hour;
     minute = other.minute;
@@ -64,7 +64,7 @@ std::string Time::to_string() {
     time_ += std::to_string(minute);
     return time_;
 }
-int Time::operator-(const Time& other) {
+int& Time::operator-(const Time& other) {
     int ans = 0;
     int delta_d = day - other.day;
     ans += delta_d * 1440;
@@ -92,7 +92,7 @@ date::date(std::string str) {
     month = std::stoi(h);
     day = std::stoi(m);
 }
-date date::operator=(const date& other) {
+date& date::operator=(const date& other) {
     month = other.month;
     day = other.day;
     return *this;

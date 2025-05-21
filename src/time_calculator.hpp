@@ -14,12 +14,12 @@ public:
     Time();
     Time(int, int);
     Time(std::string);
-    Time operator=(const Time&);
+    Time& operator=(const Time&);
     bool operator<(const Time&) const;
     bool operator>(const Time&) const;
     void add_minute(int);
     std::string to_string();
-    int operator-(const Time&);
+    int& operator-(const Time&);
 };
 class date {
 public:
@@ -28,7 +28,7 @@ public:
     date();
     date(int, int);
     date(std::string);
-    date operator=(const date&);
+    date& operator=(const date&);
     bool operator<(const date&) const;
     bool operator>(const date&) const;
     bool operator!=(const date&) const;
