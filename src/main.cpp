@@ -46,7 +46,6 @@ int main() {
         //     ticket.clear();
         } else if (ts.operation == "exit") {
             // ticket.exit();
-            account.exit();
             // train.exit();
             std::cout << '[' << ts.time << ']' << " bye" << std::endl;
             break;
