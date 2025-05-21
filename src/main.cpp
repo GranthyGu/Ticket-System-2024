@@ -1,11 +1,6 @@
 // Created by GranthyGu on 2025/5/8
 
-#include "token_scanner.hpp"
-#include "STL/vector.hpp"
-#include "b_plus_tree.hpp"
-#include "ticket_management.hpp"
 #include "account_management.hpp"
-#include "train_management.hpp"
 
 int main() {
     // freopen("in.txt", "r", stdin);   // 读入in.dat文件作为输入 
