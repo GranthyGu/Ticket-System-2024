@@ -18,8 +18,8 @@ public:
     bool operator<(const Time&) const;
     bool operator>(const Time&) const;
     void add_minute(int);
-    std::string to_string();
-    int& operator-(const Time&);
+    std::string to_string() const;
+    int operator-(const Time&);
 };
 class date {
 public:
@@ -34,9 +34,9 @@ public:
     bool operator!=(const date&) const;
     bool operator==(const date&) const;
     void add_day(int);
-    std::string to_string();
+    std::string to_string() const;
     void minus_day(int);
-    int delta_day();
+    int delta_day() const;
 };
 
 #endif    //TIME_CALCULATOR_HPP

@@ -51,7 +51,7 @@ void Time::add_minute(int m) {
     hour = hh;
     day += day_;
 }
-std::string Time::to_string() {
+std::string Time::to_string() const {
     std::string time_;
     if (hour < 10) {
         time_ += '0';
@@ -64,7 +64,7 @@ std::string Time::to_string() {
     time_ += std::to_string(minute);
     return time_;
 }
-int& Time::operator-(const Time& other) {
+int Time::operator-(const Time& other) {
     int ans = 0;
     int delta_d = day - other.day;
     ans += delta_d * 1440;
@@ -125,7 +125,7 @@ void date::add_day(int d) {
         day = (cur_day - 1) % 31 + 1;
     }
 }
-std::string date::to_string() {
+std::string date::to_string() const {
     std::string time_;
     if (month < 10) {
         time_ += '0';
@@ -152,7 +152,7 @@ void date::minus_day(int d) {
     }
     return;
 }
-int date::delta_day() {
+int date::delta_day() const {
     int delta_month = month - 6;
     int delta_day = day - 1;
     if (delta_month == 2) {
