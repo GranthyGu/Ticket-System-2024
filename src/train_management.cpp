@@ -725,7 +725,7 @@ void train_management::refund_ticket(const train_id& train, std::string begin, s
     }
     day.minus_day(info.leaving_time[index].day);
     int delta = day.delta_day();
-    for (int i = index; i <= index_; i++) {
+    for (int i = index; i < index_; i++) {
         info.seat_num[i][delta] += num;
     }
     advanced_information.remove(train);
