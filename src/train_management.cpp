@@ -20,28 +20,13 @@ train_id& train_id::operator=(const train_id& other) {
     return *this;
 }
 bool train_id::operator<(const train_id& other) const {
-    for (int i = 0; i < 20; i++) {
-        if (id[i] != other.id[i]) {
-            return id[i] < other.id[i];
-        }
-    }
-    return false;
+    return strcmp(id,other.id) < 0;
 }
 bool train_id::operator>(const train_id& other) const {
-    for (int i = 0; i < 20; i++) {
-        if (id[i] != other.id[i]) {
-            return id[i] > other.id[i];
-        }
-    }
-    return false;
+    return strcmp(id,other.id) > 0;
 }
 bool train_id::operator==(const train_id& other) const {
-    for (int i = 0; i < 20; i++) {
-        if (id[i] != other.id[i]) {
-            return false;
-        }
-    }
-    return true;
+    return strcmp(id,other.id) == 0;
 }
 
 station::station() {}
@@ -80,26 +65,23 @@ station& station::operator=(const station& other) {
     return *this;
 }
 bool station::operator<(const station& other) const {
-    for (int i = 0; i < 30; i++) {
-        if (station_name[i] != other.station_name[i]) {
-            return station_name[i] < other.station_name[i];
-        }
+    int res = strcmp(station_name, other.station_name);
+    if (res != 0) {
+        return res < 0;
     }
     return id < other.id;
 }
 bool station::operator>(const station& other) const {
-    for (int i = 0; i < 30; i++) {
-        if (station_name[i] != other.station_name[i]) {
-            return station_name[i] > other.station_name[i];
-        }
+    int res = strcmp(station_name, other.station_name);
+    if (res != 0) {
+        return res > 0;
     }
     return id > other.id;
 }
 bool station::operator==(const station& other) const {
-    for (int i = 0; i < 30; i++) {
-        if (station_name[i] != other.station_name[i]) {
-            return false;
-        }
+    int res = strcmp(station_name, other.station_name);
+    if (res != 0) {
+        return false;
     }
     return id == other.id;
 }

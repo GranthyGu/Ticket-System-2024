@@ -109,28 +109,17 @@ key_for_ticket_user& key_for_ticket_user::operator=(const key_for_ticket_user& o
     return *this;
 }
 bool key_for_ticket_user::operator<(const key_for_ticket_user& other) const {
-    for (int i = 0; i < 20; i++) {
-        if (user_name[i] != other.user_name[i]) {
-            return user_name[i] < other.user_name[i];
-        }
-    }
+    if(const auto res = strcmp(user_name, other.user_name))
+        return res < 0;
     return time_ < other.time_;
 }
 bool key_for_ticket_user::operator>(const key_for_ticket_user& other) const {
-    for (int i = 0; i < 20; i++) {
-        if (user_name[i] != other.user_name[i]) {
-            return user_name[i] > other.user_name[i];
-        }
-    }
+    if(const auto res = strcmp(user_name, other.user_name))
+        return res > 0;
     return time_ > other.time_;
 }
 bool key_for_ticket_user::operator==(const key_for_ticket_user& other) const {
-    for (int i = 0; i < 20; i++) {
-        if (user_name[i] != other.user_name[i]) {
-            return false;
-        }
-    }
-    return time_ == other.time_;
+    return strcmp(user_name, other.user_name) == 0 && time_ == other.time_;
 }
 
 info_for_ticket_user::info_for_ticket_user() {}
