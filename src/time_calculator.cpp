@@ -4,6 +4,7 @@
 
 Time::Time() {
     hour = minute = 0;
+    day = 0;
 }
 Time::Time(int h, int m) {
     hour = h; 
@@ -17,6 +18,11 @@ Time::Time(std::string str) {
     m += str[4];
     hour = std::stoi(h);
     minute = std::stoi(m);
+}
+Time::Time(const Time& other) {
+    day = other.day;
+    hour = other.hour;
+    minute = other.minute;
 }
 Time& Time::operator=(const Time& other) {
     day = other.day;
@@ -91,6 +97,10 @@ date::date(std::string str) {
     m += str[4];
     month = std::stoi(h);
     day = std::stoi(m);
+}
+date::date(const date& other) {
+    month = other.month;
+    day = other.day;
 }
 date& date::operator=(const date& other) {
     month = other.month;

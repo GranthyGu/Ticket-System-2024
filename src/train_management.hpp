@@ -16,6 +16,7 @@ public:
     char id[20] = {0};
     train_id();
     train_id(std::string);
+    train_id(const train_id&);
     train_id& operator=(const train_id&);
     bool operator<(const train_id&) const;
     bool operator>(const train_id&) const;
@@ -24,13 +25,14 @@ public:
 
 class information {
 public:
-    int station_num;
-    char type;
+    int station_num = 0;
+    char type = 0;
     char stations[100][30] = {0};
     date sale_date_begin;
     date sale_date_end;
     int prices[100] = {0};    // prefix_sum
     information();
+    information(const information&);
     information(std::string, std::string, std::string, std::string, std::string);
     information& operator=(const information&);
     sjtu::vector<std::string> get_stations();
@@ -45,6 +47,7 @@ public:
     Time leaving_time[100];    // leaving_time[i] saves the time leave the ith station.
     train_information();
     train_information(std::string, std::string, std::string, std::string);
+    train_information(const train_information&);
     train_information& operator=(const train_information&);
 };
 
@@ -57,6 +60,7 @@ public:
     station();
     station(std::string, std::string, Time, Time);
     station(std::string, train_id, Time, Time);
+    station(const station&);
     station& operator=(const station&);
     bool operator<(const station&) const;
     bool operator>(const station&) const;
@@ -74,9 +78,9 @@ struct temp {
 
 class train_management {
 private:
-    B_plus_tree<train_id, information, 14, 20> basic_information;
-    B_plus_tree<train_id, train_information, 140, 20> advanced_information;
-    B_plus_tree<station, std::pair<int, int>, 80, 100> released_station_train_id_list;
+    B_plus_tree<train_id, information, 140, 3> basic_information;
+    B_plus_tree<train_id, train_information, 140, 3> advanced_information;
+    B_plus_tree<station, std::pair<int, int>, 60, 120> released_station_train_id_list;
     B_plus_tree<int, station, 100, 100> station_name;
     int num = 1;
     sjtu::vector<temp> query_ticket_(std::string, std::string, date);

@@ -10,6 +10,11 @@ key_for_ticket::key_for_ticket(int t, std::string str1, std::string str2) {
     date temp_(str2);
     date_ = temp_;
 }
+key_for_ticket::key_for_ticket(const key_for_ticket& other) {
+    time_ = other.time_;
+    id = other.id;
+    date_ = other.date_;
+}
 key_for_ticket& key_for_ticket::operator=(const key_for_ticket& other) {
     time_ = other.time_;
     id = other.id;
@@ -59,6 +64,17 @@ info_for_ticket::info_for_ticket(std::string d, std::string str1, std::string st
     date_ = temp;
     num = std::stoi(str4);
 }
+info_for_ticket::info_for_ticket(const info_for_ticket& other) {
+    date_ = other.date_;
+    for (int i = 0; i < 20; i++) {
+        user_name[i] = other.user_name[i];
+    }
+    for (int i = 0; i < 30; i++) {
+        from[i] = other.from[i];
+        to[i] = other.to[i];
+    }
+    num = other.num;
+}
 info_for_ticket& info_for_ticket::operator=(const info_for_ticket& other) {
     date_ = other.date_;
     for (int i = 0; i < 20; i++) {
@@ -77,6 +93,12 @@ key_for_ticket_user::key_for_ticket_user(int t, std::string str1) {
     time_ = t;
     for (int i = 0; i < 20; i++) {
         user_name[i] = str1[i];
+    }
+}
+key_for_ticket_user::key_for_ticket_user(const key_for_ticket_user& other) {
+    time_ = other.time_;
+    for (int i = 0; i < 20; i++) {
+        user_name[i] = other.user_name[i];
     }
 }
 key_for_ticket_user& key_for_ticket_user::operator=(const key_for_ticket_user& other) {
@@ -124,6 +146,16 @@ info_for_ticket_user::info_for_ticket_user(std::string str1, std::string str2, s
         to[i] = str4[i];
     }
     num = std::stoi(str5);
+}
+info_for_ticket_user::info_for_ticket_user(const info_for_ticket_user& other) {
+    id = other.id;
+    date_ = other.date_;
+    for (int i = 0; i < 30; i++) {
+        from[i] = other.from[i];
+        to[i] = other.to[i];
+    }
+    num = other.num;
+    statu = other.statu;
 }
 info_for_ticket_user& info_for_ticket_user::operator=(const info_for_ticket_user& other) {
     id = other.id;

@@ -8,6 +8,11 @@ train_id::train_id(std::string str) {
         id[i] = str[i];
     }
 }
+train_id::train_id(const train_id& other) {
+    for (int i = 0; i < 20; i++) {
+        id[i] = other.id[i];
+    }
+}
 train_id& train_id::operator=(const train_id& other) {
     for (int i = 0; i < 20; i++) {
         id[i] = other.id[i];
@@ -57,6 +62,14 @@ station::station(std::string str, train_id id_, Time t, Time t_) {
     time_arrival = t;
     time_leave = t_;
 }
+station::station(const station& other) {
+    for (int i = 0; i < 30; i++) {
+        station_name[i] = other.station_name[i];
+    }
+    id = other.id;
+    time_arrival = other.time_arrival;
+    time_leave = other.time_leave;
+}
 station& station::operator=(const station& other) {
     for (int i = 0; i < 30; i++) {
         station_name[i] = other.station_name[i];
@@ -93,9 +106,7 @@ bool station::operator==(const station& other) const {
 
 information::information() {
     for (int i = 0; i < 100; i++) {
-        for (int j = 0; j < 30; j++) {
-            stations[i][j] = 0;
-        }
+        prices[i] = 0;
     }
 }
 information::information(std::string num, std::string type_, std::string stations_,
@@ -143,6 +154,20 @@ information::information(std::string num, std::string type_, std::string station
         prices[i] = prices[i - 1] + prices_[i - 1];
     }
 }
+information::information(const information& other) {
+    station_num = other.station_num;
+    type = other.type;
+    sale_date_begin = other.sale_date_begin;
+    sale_date_end = other.sale_date_end;
+    for (int i = 0; i < 100; i++) {
+        prices[i] = other.prices[i];
+    }
+    for (int i = 0; i < 100; i++) {
+        for (int j = 0; j < 30; j++) {
+            stations[i][j] = other.stations[i][j];
+        }
+    }
+}
 information& information::operator=(const information& other) {
     station_num = other.station_num;
     type = other.type;
@@ -167,7 +192,14 @@ sjtu::vector<std::string> information::get_stations() {
     return v;
 }
 
-train_information::train_information() {}
+train_information::train_information() {
+    released = 0;
+    for (int i = 0; i < 100; i++) {
+        for (int j = 0; j < 92; j++) {
+            seat_num[i][j] = 0;
+        }
+    }
+}
 train_information::train_information(std::string str1, std::string str2, std::string str3, std::string str4) {
     int num = std::stoi(str1);
     for (int i = 0; i < 100; i++) {
@@ -210,6 +242,17 @@ train_information::train_information(std::string str1, std::string str2, std::st
     }
     start.add_minute(arrive[arrive.size() - 1]);
     arriving_time[arrive.size()] = start;
+}
+train_information::train_information(const train_information& other) {
+    for (int i = 0; i < 100; i++) {
+        for (int j = 0; j < 92; j++) {
+            seat_num[i][j] = other.seat_num[i][j];
+        }
+        arriving_time[i] = other.arriving_time[i];
+        leaving_time[i] = other.leaving_time[i];
+    }
+    start_time = other.start_time;
+    released = other.released;
 }
 train_information& train_information::operator=(const train_information& other) {
     for (int i = 0; i < 100; i++) {
@@ -412,15 +455,15 @@ template <typename Compare, class T>
 void quick_sort(sjtu::vector<T> &v, int left, int right, Compare cmp) {
     if (left >= right) return;
     T pivot = v[left];
-    int i = left, j = right;
-    while (i < j) {
-        while (i < j && !cmp(v[j], pivot)) j--;
-        while (i < j && cmp(v[i], pivot)) i++;
-        if (i < j) std::swap(v[i], v[j]);
+    int i = left - 1, j = right + 1;
+    while (true) {
+        do { i++; } while (cmp(v[i],pivot));
+        do { j--; } while (cmp(pivot,v[j]));
+        if (i >= j) break;
+        std::swap(v[i], v[j]);
     }
-    std::swap(v[left], v[i]);
-    quick_sort(v, left, i - 1, cmp);
-    quick_sort(v, i + 1, right, cmp);
+    quick_sort(v, left, j,cmp);
+    quick_sort(v, j + 1, right,cmp);
 }
 void sort_by_time(sjtu::vector<temp> &v) {
     quick_sort(v, 0, v.size() - 1, compare_time);

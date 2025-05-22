@@ -36,9 +36,13 @@ public:
     int is_leaf;
     int size;
     T key[M + 1] = {};
-    long address_of_children[M + 1] = {-1};
+    long address_of_children[M + 1];
     long address_of_parent;
-    Node() : is_leaf(0), size(0), address_of_parent(-1) {}
+    Node() : is_leaf(0), size(0), address_of_parent(-1) {
+        for (int i = 0; i <= M; i++) {
+            address_of_children[i] = -1;
+        }
+    }
     Node(int leaf, int size, T* key_, long* add, long add_parent) : is_leaf(leaf), size(size), address_of_parent(add_parent) {
         for (int i = 0; i < M; i++) {
             key[i] = key_[i];
@@ -57,19 +61,11 @@ public:
     }
     void write_to_file(std::fstream& File) {
         if (!File) {return;}
-        File.write(reinterpret_cast<char*> (&is_leaf), sizeof(int));
-        File.write(reinterpret_cast<char*> (&size), sizeof(int));
-        File.write(reinterpret_cast<char*> (key), (M + 1)* sizeof(T));
-        File.write(reinterpret_cast<char*> (address_of_children), (M + 1) * sizeof(long));
-        File.write(reinterpret_cast<char*> (&address_of_parent), sizeof(long));
+        File.write(reinterpret_cast<char*> (this), sizeof(*this));
     }
     void read_from_file(std::fstream& File) {
         if (!File) {return;}
-        File.read(reinterpret_cast<char*> (&is_leaf), sizeof(int));
-        File.read(reinterpret_cast<char*> (&size), sizeof(int));
-        File.read(reinterpret_cast<char*> (key), (M + 1) * sizeof(T));
-        File.read(reinterpret_cast<char*> (address_of_children), (M + 1) * sizeof(long));
-        File.read(reinterpret_cast<char*> (&address_of_parent), sizeof(long));
+        File.read(reinterpret_cast<char*> (this), sizeof(*this));
     }
 };
 template<typename T, typename V, const int M, const int L>
@@ -99,19 +95,11 @@ public:
     }
     void write_to_file(std::fstream& File) {
         if (!File) {return;}
-        File.write(reinterpret_cast<char*> (&size), sizeof(int));
-        File.write(reinterpret_cast<char*> (key), (L + 1)* sizeof(T));
-        File.write(reinterpret_cast<char*> (value), (L + 1)* sizeof(V));
-        File.write(reinterpret_cast<char*> (&address_of_right_node), sizeof(long));
-        File.write(reinterpret_cast<char*> (&address_of_parent), sizeof(long));
+        File.write(reinterpret_cast<char*> (this), sizeof(*this));
     }
     void read_from_file(std::fstream& File) {
         if (!File) {return;}
-        File.read(reinterpret_cast<char*> (&size), sizeof(int));
-        File.read(reinterpret_cast<char*> (key), (L + 1) * sizeof(T));
-        File.read(reinterpret_cast<char*> (value), (L + 1) * sizeof(V));
-        File.read(reinterpret_cast<char*> (&address_of_right_node), sizeof(long));
-        File.read(reinterpret_cast<char*> (&address_of_parent), sizeof(long));
+        File.read(reinterpret_cast<char*> (this), sizeof(*this));
     }
 };
 template<typename T, typename V, const int M, const int L>
