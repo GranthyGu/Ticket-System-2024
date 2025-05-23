@@ -307,7 +307,7 @@ void ticket_management::refund_ticket(const token_scanner& ts) {
             sjtu::vector<std::pair<key_for_ticket_user, info_for_ticket_user>> r = ticket_list_by_user.find(minimal__, minimal__);
             key_for_ticket_user key__ = r[0].first;
             info_for_ticket_user info__ = r[0].second;
-            info__.statu = 2;
+            info__.statu = 1;
             ticket_list_by_user.remove(key__);
             ticket_list_by_user.insert(key__, info__);
         }
