@@ -68,8 +68,8 @@ class ticket_management {
 private:
     train_management train_manage;
     account_management account_manage;
-    B_plus_tree<key_for_ticket, info_for_ticket, 80, 30> standby_by_train_date;
-    B_plus_tree<key_for_ticket_user, info_for_ticket_user, 80, 30> ticket_list_by_user;
+    B_plus_tree<key_for_ticket, info_for_ticket, 80, 40> standby_by_train_date;
+    B_plus_tree<key_for_ticket_user, info_for_ticket_user, 100, 30> ticket_list_by_user;
     std::pair<date, int> buy(const key_for_ticket_user&, const info_for_ticket_user&);
     std::pair<date, int> query_pending(const key_for_ticket&, const info_for_ticket&);
 public:
