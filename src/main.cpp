@@ -1,12 +1,11 @@
 // Created by GranthyGu on 2025/5/8
 
-#include "account_management.hpp"
 #include "ticket_management.hpp"
-#include "train_management.hpp"
+#pragma GCC optimize ("Ofast")
 
 int main() {
-    // freopen("in.txt", "r", stdin);   // 读入in.dat文件作为输入 
-	// freopen("out.dat", "w", stdout);  // 将输入写入out.dat文件中 
+    freopen("in.txt", "r", stdin);   // 读入in.dat文件作为输入 
+	freopen("out.dat", "w", stdout);  // 将输入写入out.dat文件中 
     ticket_management ticket;
     while (true) {
         std::string order;
