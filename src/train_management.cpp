@@ -85,6 +85,27 @@ bool station::operator==(const station& other) const {
     }
     return id == other.id;
 }
+s_name::s_name() {}
+s_name::s_name(std::string other) {
+    for (int i = 0; i < other.size(); i++) {
+        station_name[i] = other[i];
+    }
+}
+s_name& s_name::operator=(const s_name& other) {
+    for (int i = 0; i < 31; i++) {
+        station_name[i] = other.station_name[i];
+    }
+    return *this;
+}
+bool s_name::operator<(const s_name& other) const {
+    return strcmp(station_name,other.station_name) < 0;
+}
+bool s_name::operator>(const s_name& other) const {
+    return strcmp(station_name,other.station_name) > 0;
+}
+bool s_name::operator==(const s_name& other) const {
+    return strcmp(station_name,other.station_name) == 0;
+}
 
 information::information() {
     for (int i = 0; i < 100; i++) {
@@ -324,7 +345,7 @@ void train_management::release_train(const token_scanner& ts) {
     advanced_information.insert(id, info_);
     sjtu::vector<std::string> station_info = info.get_stations();
     for (int i = 0; i < station_info.size(); i++) {
-        bool flag = station_name.insert(num, station(station_info[i], ID, Time(), Time()));
+        bool flag = station_name.insert(num, s_name(station_info[i]));
         num += flag;
         station station_(station_info[i], ID, info_.arriving_time[i], info_.leaving_time[i]);
         released_station_train_id_list.insert(station_, std::make_pair(i, info.prices[i]));
@@ -530,7 +551,7 @@ sjtu::vector<std::pair<temp, int> > train_management::query_ticket__(std::string
                     if (info.sale_date_begin > d) {
                         day_ = info.sale_date_begin.delta_day() - d.delta_day();
                     } else {
-                        if ((train_end.time_leave.hour < time_.hour || (train_end.time_leave.hour == time_.hour && train_end.time_leave.minute < time_.minute))) {
+                        if ((train.time_leave.hour < time_.hour || (train.time_leave.hour == time_.hour && train.time_leave.minute < time_.minute))) {
                             day_ = 1;
                         }
                     }
@@ -602,7 +623,7 @@ void train_management::query_transfer(const token_scanner& ts) {
     date d(date_);
     sjtu::vector<std::pair<std::pair<temp, temp>, int> > train_satisfied;
     for (int i = 1; i <= num; i++) {
-        sjtu::vector<std::pair<int, station> > stations = station_name.find(i, i);
+        sjtu::vector<std::pair<int, s_name> > stations = station_name.find(i, i);
         if (stations.empty()) {
             continue;
         }

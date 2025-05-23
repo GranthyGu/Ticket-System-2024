@@ -66,7 +66,16 @@ public:
     bool operator>(const station&) const;
     bool operator==(const station&) const;
 };
-
+class s_name {
+public:
+    char station_name[31] = {0};
+    s_name();
+    s_name(std::string);
+    s_name& operator=(const s_name&);
+    bool operator<(const s_name&) const;
+    bool operator>(const s_name&) const;
+    bool operator==(const s_name&) const;
+};
 struct temp {
     station begin;
     station end;
@@ -78,10 +87,10 @@ struct temp {
 
 class train_management {
 private:
-    B_plus_tree<train_id, information, 120, 5> basic_information;
-    B_plus_tree<train_id, train_information, 120, 5> advanced_information;
+    B_plus_tree<train_id, information, 120, 3> basic_information;
+    B_plus_tree<train_id, train_information, 120, 3> advanced_information;
     B_plus_tree<station, std::pair<int, int>, 60, 50> released_station_train_id_list;
-    B_plus_tree<int, station, 100, 100> station_name;
+    B_plus_tree<int, s_name, 100, 60> station_name;
     int num = 1;
     sjtu::vector<temp> query_ticket_(std::string, std::string, date);
     sjtu::vector<std::pair<temp, int>> query_ticket__(std::string, std::string, date, Time time);
