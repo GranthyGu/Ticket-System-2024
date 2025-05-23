@@ -23,7 +23,7 @@ public:
     bool operator==(const train_id&) const;
 };
 
-class train_information{
+class information {
 public:
     int station_num = 0;
     char type = 0;
@@ -31,17 +31,28 @@ public:
     date sale_date_begin;
     date sale_date_end;
     int prices[101] = {0};    // prefix_sum
+    information();
+    information(const information&);
+    information(std::string, std::string, std::string, std::string, std::string);
+    information& operator=(const information&);
+    sjtu::vector<std::string> get_stations();
+    void write_to_file(std::fstream& File, long pos);
+    void read_from_file(std::fstream& File, long pos);
+};
+
+class train_information{
+public:
     int released = 0;
     int seat_num[100][92];
     Time start_time;
     Time arriving_time[101];   // arriving_time[i] saves the time to the ith station.
     Time leaving_time[101];    // leaving_time[i] saves the time leave the ith station.
     train_information();
-    train_information(std::string, std::string, std::string, std::string, std::string, std::string, std::string, std::string, std::string);
+    train_information(std::string, std::string, std::string, std::string);
+    train_information(const train_information&);
     train_information& operator=(const train_information&);
     void write_to_file(std::fstream& File, long pos);
     void read_from_file(std::fstream& File, long pos);
-    sjtu::vector<std::string> get_stations();
 };
 
 class station {
@@ -70,11 +81,13 @@ struct temp {
 
 class train_management {
 private:
-    B_plus_tree<train_id, long, 100, 100> advanced_information;
-    B_plus_tree<station, std::pair<int, int>, 60, 60> released_station_train_id_list;
+    B_plus_tree<train_id, long, 120, 3> basic_information;
+    B_plus_tree<train_id, long, 120, 100> advanced_information;
+    B_plus_tree<station, std::pair<int, int>, 60, 50> released_station_train_id_list;
     sjtu::vector<temp> query_ticket_(std::string, std::string, date);
     sjtu::vector<std::pair<temp, int>> query_ticket__(std::string, std::string, date, Time time);
     std::fstream File;
+    std::fstream File_;
 public:
     train_management();
     void add_train(const token_scanner&);

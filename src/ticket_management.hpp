@@ -35,8 +35,6 @@ public:
     info_for_ticket(std::string, std::string, std::string, std::string, std::string);
     info_for_ticket(const info_for_ticket&);
     info_for_ticket& operator=(const info_for_ticket&);
-    void write_to_node(std::fstream&, long);
-    void read_from_node(std::fstream&, long);
 };
 
 class key_for_ticket_user {
@@ -64,20 +62,16 @@ public:
     info_for_ticket_user(std::string, std::string, std::string, std::string, std::string);
     info_for_ticket_user(const info_for_ticket_user&);
     info_for_ticket_user& operator=(const info_for_ticket_user&);
-    void write_to_node(std::fstream&, long);
-    void read_from_node(std::fstream&, long);
 };
 
 class ticket_management {
 private:
     train_management train_manage;
     account_management account_manage;
-    B_plus_tree<key_for_ticket, long, 100, 100> standby_by_train_date;
-    B_plus_tree<key_for_ticket_user, long, 100, 100> ticket_list_by_user;
+    B_plus_tree<key_for_ticket, info_for_ticket, 80, 40> standby_by_train_date;
+    B_plus_tree<key_for_ticket_user, info_for_ticket_user, 100, 30> ticket_list_by_user;
     std::pair<date, int> buy(const key_for_ticket_user&, const info_for_ticket_user&);
     std::pair<date, int> query_pending(const key_for_ticket&, const info_for_ticket&);
-    std::fstream File;
-    std::fstream File_;
 public:
     ticket_management();
     void buy_ticket(const token_scanner&);
