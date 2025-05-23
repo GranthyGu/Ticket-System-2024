@@ -70,8 +70,8 @@ struct temp {
 
 class train_management {
 private:
-    B_plus_tree<train_id, long, 120, 100> advanced_information;
-    B_plus_tree<station, std::pair<int, int>, 60, 50> released_station_train_id_list;
+    B_plus_tree<train_id, long, 100, 100> advanced_information;
+    B_plus_tree<station, std::pair<int, int>, 60, 60> released_station_train_id_list;
     sjtu::vector<temp> query_ticket_(std::string, std::string, date);
     sjtu::vector<std::pair<temp, int>> query_ticket__(std::string, std::string, date, Time time);
     std::fstream File;

@@ -87,6 +87,16 @@ info_for_ticket& info_for_ticket::operator=(const info_for_ticket& other) {
     num = other.num;
     return *this;
 }
+void info_for_ticket::write_to_node(std::fstream& File_t, long pos) {
+    if (!File_t) {return;}
+    File_t.seekp(pos);
+    File_t.write(reinterpret_cast<char*> (this), sizeof(*this));
+}
+void info_for_ticket::read_from_node(std::fstream& File_t, long pos) {
+    if (!File_t) {return;}
+    File_t.seekg(pos);
+    File_t.read(reinterpret_cast<char*> (this), sizeof(*this));
+}
 
 key_for_ticket_user::key_for_ticket_user() {}
 key_for_ticket_user::key_for_ticket_user(int t, std::string str1) {
@@ -157,10 +167,36 @@ info_for_ticket_user& info_for_ticket_user::operator=(const info_for_ticket_user
     statu = other.statu;
     return *this;
 }
+void info_for_ticket_user::write_to_node(std::fstream& File_t, long pos) {
+    if (!File_t) {return;}
+    File_t.seekp(pos);
+    File_t.write(reinterpret_cast<char*> (this), sizeof(*this));
+}
+void info_for_ticket_user::read_from_node(std::fstream& File_t, long pos) {
+    if (!File_t) {return;}
+    File_t.seekg(pos);
+    File_t.read(reinterpret_cast<char*> (this), sizeof(*this));
+}
 
 ticket_management::ticket_management() {
     ticket_list_by_user.set_file_name("ticket_information");
     standby_by_train_date.set_file_name("pending_queue");
+    File.open("file_for_ticket_information", std::ios::in | std::ios::out | std::ios::binary);
+    File_.open("file_for_ticket_information_", std::ios::in | std::ios::out | std::ios::binary);
+    if (!File) {
+        File.clear();
+        File.open("file_for_ticket_information", std::ios::out | std::ios::binary);
+        File.close();
+        File.clear();
+        File.open("file_for_ticket_information", std::ios::in | std::ios::out | std::ios::binary);
+    }
+    if (!File_) {
+        File_.clear();
+        File_.open("file_for_ticket_information_", std::ios::out | std::ios::binary);
+        File_.close();
+        File_.clear();
+        File_.open("file_for_ticket_information_", std::ios::in | std::ios::out | std::ios::binary);
+    }
 }
 std::pair<date, int> ticket_management::buy(const key_for_ticket_user& key, const info_for_ticket_user& ticket) {
     train_id id = ticket.id;
@@ -211,12 +247,21 @@ void ticket_management::buy_ticket(const token_scanner& ts) {
             info_user.statu = 2;
             key_for_ticket key_(ts.time, ID, flag.first.to_string());
             info_for_ticket ticket_(flag.first.to_string(), user_name, from, to, num);
-            standby_by_train_date.insert(key_, ticket_);
-            ticket_list_by_user.insert(ticket_user, info_user);
+            File.seekp(0, std::ios::end);
+            long pos = File.tellp();
+            ticket_.write_to_node(File, pos);
+            File_.seekp(0, std::ios::end);
+            long pos_ = File_.tellp();
+            info_user.write_to_node(File_, pos_);
+            standby_by_train_date.insert(key_, pos);
+            ticket_list_by_user.insert(ticket_user, pos_);
             std::cout << '[' << ts.time << ']' << ' ' << "queue" << std::endl;
         }
     } else {
-        ticket_list_by_user.insert(ticket_user, info_user);
+        File_.seekp(0, std::ios::end);
+        long pos_ = File_.tellp();
+        info_user.write_to_node(File_, pos_);
+        ticket_list_by_user.insert(ticket_user, pos_);
         std::cout << '[' << ts.time << ']' << ' ' << flag.second << std::endl;
     }
 }
@@ -229,11 +274,12 @@ void ticket_management::query_order(const token_scanner& ts) {
     }
     key_for_ticket_user minimal(-1, user_name);
     key_for_ticket_user maximal(1e9, user_name);
-    sjtu::vector<std::pair<key_for_ticket_user, info_for_ticket_user>> result = ticket_list_by_user.find(minimal, maximal);
+    sjtu::vector<std::pair<key_for_ticket_user, long>> result = ticket_list_by_user.find(minimal, maximal);
     std::cout << '[' << ts.time << ']' << ' ' << result.size() << std::endl;
     for (int i = result.size() - 1; i >= 0; i--) {
         key_for_ticket_user user = result[i].first;
-        info_for_ticket_user info = result[i].second;
+        info_for_ticket_user info;
+        info.read_from_node(File_, result[i].second);
         if (info.statu == 1) {
             std::cout << "[success] ";
         } else if (info.statu == 2) {
@@ -269,13 +315,14 @@ void ticket_management::refund_ticket(const token_scanner& ts) {
     }
     key_for_ticket_user minimal(-1, user_name);
     key_for_ticket_user maximal(1e9, user_name);
-    sjtu::vector<std::pair<key_for_ticket_user, info_for_ticket_user>> result = ticket_list_by_user.find(minimal, maximal);
+    sjtu::vector<std::pair<key_for_ticket_user, long>> result = ticket_list_by_user.find(minimal, maximal);
     if (result.size() < number) {
         std::cout << '[' << ts.time << ']' << ' ' << -1 << std::endl;
         return;
     }
     key_for_ticket_user key = result[result.size() - number].first;
-    info_for_ticket_user info = result[result.size() - number].second;
+    info_for_ticket_user info;
+    info.read_from_node(File_, result[result.size() - number].second);
     if (info.statu == 3) {
         std::cout << '[' << ts.time << ']' << ' ' << -1 << std::endl;
         return;
@@ -285,31 +332,30 @@ void ticket_management::refund_ticket(const token_scanner& ts) {
     d.minus_day(t.day);
     if (info.statu == 2) {
         info.statu = 3;
-        ticket_list_by_user.remove(key);
-        ticket_list_by_user.insert(key, info);
+        info.write_to_node(File_, result[result.size() - number].second);
         standby_by_train_date.remove(key_for_ticket(key.time_, info.id.id, d.to_string()));
         std::cout << '[' << ts.time << ']' << ' ' << 0 << std::endl;
         return;
     }
     info.statu = 3;
-    ticket_list_by_user.remove(key);
-    ticket_list_by_user.insert(key, info);
+    info.write_to_node(File_, result[result.size() - number].second);
     train_manage.refund_ticket(info.id, info.from, info.to, info.date_, info.num);
     key_for_ticket minimal_(-1, std::string(info.id.id), d.to_string());
     key_for_ticket maximal_(1e9, std::string(info.id.id), d.to_string());
-    sjtu::vector<std::pair<key_for_ticket, info_for_ticket>> result_ = standby_by_train_date.find(minimal_, maximal_);
+    sjtu::vector<std::pair<key_for_ticket, long>> result_ = standby_by_train_date.find(minimal_, maximal_);
     for (int i = 0; i < result_.size(); i++) {
-        if (query_pending(result_[i].first, result_[i].second).second > 0) {
+        info_for_ticket info_;
+        info_.read_from_node(File, result_[i].second);
+        if (query_pending(result_[i].first, info_).second > 0) {
             key_for_ticket key_ = result_[i].first;
-            info_for_ticket info_ = result_[i].second;
             standby_by_train_date.remove(key_);
             key_for_ticket_user minimal__(key_.time_, std::string(info_.user_name));
-            sjtu::vector<std::pair<key_for_ticket_user, info_for_ticket_user>> r = ticket_list_by_user.find(minimal__, minimal__);
+            sjtu::vector<std::pair<key_for_ticket_user, long>> r = ticket_list_by_user.find(minimal__, minimal__);
             key_for_ticket_user key__ = r[0].first;
-            info_for_ticket_user info__ = r[0].second;
+            info_for_ticket_user info__;
+            info__.read_from_node(File_, r[0].second);
             info__.statu = 1;
-            ticket_list_by_user.remove(key__);
-            ticket_list_by_user.insert(key__, info__);
+            info__.write_to_node(File_, r[0].second);
         }
     }
     std::cout << '[' << ts.time << ']' << ' ' << 0 << std::endl;
