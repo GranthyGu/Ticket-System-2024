@@ -82,7 +82,7 @@ struct temp {
 
 class train_management {
 private:
-    B_plus_tree<train_id, long, 120, 3> basic_information;
+    B_plus_tree<train_id, long, 120, 100> basic_information;
     B_plus_tree<train_id, long, 120, 100> advanced_information;
     B_plus_tree<station, std::pair<int, int>, 60, 50> released_station_train_id_list;
     sjtu::vector<temp> query_ticket_(std::string, std::string, date);
