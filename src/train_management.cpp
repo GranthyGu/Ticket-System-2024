@@ -413,7 +413,7 @@ bool compare_time_transfer(const std::pair<std::pair<temp, temp>, int>& a, const
     if (!(a.first.first.begin.id == b.first.first.begin.id)) {
         return a.first.first.begin.id < b.first.first.begin.id;
     }
-    return a.first.second.begin.id == b.first.second.begin.id;
+    return a.first.second.begin.id < b.first.second.begin.id;
 }
 bool compare_price_transfer(const std::pair<std::pair<temp, temp>, int>& a, const std::pair<std::pair<temp, temp>, int> b) {
     int a_time = 1440 * a.second + a.first.first.time_ + a.first.second.time_ + (a.first.second.begin.time_leave.hour - a.first.first.end.time_arrival.hour) * 60 
@@ -431,7 +431,7 @@ bool compare_price_transfer(const std::pair<std::pair<temp, temp>, int>& a, cons
     if (!(a.first.first.begin.id == b.first.first.begin.id)) {
         return a.first.first.begin.id < b.first.first.begin.id;
     }
-    return a.first.second.begin.id == b.first.second.begin.id;
+    return a.first.second.begin.id < b.first.second.begin.id;
 }
 template <typename Compare, class T>
 void quick_sort(sjtu::vector<T> &v, int left, int right, Compare cmp) {
@@ -633,7 +633,7 @@ void train_management::query_transfer(const token_scanner& ts) {
     } else if (sort_ == "cost") {
         sort_by_price_transfer(train_satisfied);
     }
-    std::cout << '[' << ts.time << ']' << ' ' << std::endl;
+    std::cout << '[' << ts.time << "] ";
     std::cout << train_satisfied[0].first.first.begin.id.id << ' ' << train_satisfied[0].first.first.begin.station_name << ' ';
     date day(date_);
     date day_(date_);
@@ -641,7 +641,7 @@ void train_management::query_transfer(const token_scanner& ts) {
     std::cout << day.to_string() << ' ' << train_satisfied[0].first.first.begin.time_leave.to_string() 
                 << " -> " << train_satisfied[0].first.first.end.station_name << ' ';
     day.add_day(train_satisfied[0].first.first.end.time_arrival.day - train_satisfied[0].first.first.begin.time_arrival.day);
-    std::cout << day.to_string() << ' ' << train_satisfied[0].first.first.end.time_arrival.to_string() << train_satisfied[0].first.first.price << ' ';
+    std::cout << day.to_string() << ' ' << train_satisfied[0].first.first.end.time_arrival.to_string() << ' ' << train_satisfied[0].first.first.price << ' ';
     sjtu::vector<std::pair<train_id, train_information> > v = advanced_information.find(train_satisfied[0].first.first.begin.id, train_satisfied[0].first.first.begin.id);
     train_information info_ = v[0].second;
     int seat_ = 1e9;
@@ -657,7 +657,7 @@ void train_management::query_transfer(const token_scanner& ts) {
     std::cout << day.to_string() << ' ' << train_satisfied[0].first.second.begin.time_leave.to_string() 
                 << " -> " << train_satisfied[0].first.second.end.station_name << ' ';
     day.add_day(train_satisfied[0].first.second.end.time_arrival.day - train_satisfied[0].first.second.begin.time_arrival.day);
-    std::cout << day.to_string() << ' ' << train_satisfied[0].first.second.end.time_arrival.to_string() << train_satisfied[0].first.second.price << ' ';
+    std::cout << day.to_string() << ' ' << train_satisfied[0].first.second.end.time_arrival.to_string() << ' ' << train_satisfied[0].first.second.price << ' ';
     sjtu::vector<std::pair<train_id, train_information> > v_ = advanced_information.find(train_satisfied[0].first.second.begin.id, train_satisfied[0].first.second.begin.id);
     train_information info__ = v_[0].second;
     seat_ = 1e9;

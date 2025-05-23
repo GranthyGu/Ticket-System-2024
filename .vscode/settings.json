@@ -55,6 +55,7 @@
         "queue": "cpp",
         "print": "cpp",
         "stack": "cpp",
-        "climits": "cpp"
+        "climits": "cpp",
+        "sstream": "cpp"
     }
 }
