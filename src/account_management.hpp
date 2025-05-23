@@ -13,7 +13,7 @@ public:
     char username_[21] = {0};
     username();
     username(const username&);
-    username(std::string);
+    username(const std::string&);
     username& operator=(const username&);
     bool operator<(const username&) const;
     bool operator>(const username&) const;
@@ -25,7 +25,7 @@ public:
     char password_[31] = {0};
     password();
     password(const password&);
-    password(std::string);
+    password(const std::string&);
     password& operator=(const password&);
 };
 
@@ -33,7 +33,7 @@ class name {
 public:
     char name_[21] = {0};
     name();
-    name(std::string);
+    name(const std::string&);
     name(const name&);
     name& operator=(const name&);
 };
@@ -42,7 +42,7 @@ class mail_address {
 public:
     char mail_address_[31] = {0};
     mail_address();
-    mail_address(std::string);
+    mail_address(const std::string&);
     mail_address(const mail_address&);
     mail_address& operator=(const mail_address&);
 };

@@ -3,7 +3,7 @@
 #include "train_management.hpp"
 
 train_id::train_id() {}
-train_id::train_id(std::string str) {
+train_id::train_id(const std::string& str) {
     for (int i = 0; i < str.size(); i++) {
         id[i] = str[i];
     }
@@ -30,7 +30,7 @@ bool train_id::operator==(const train_id& other) const {
 }
 
 station::station() {}
-station::station(std::string str, std::string str_, Time t, Time t_) {
+station::station(const std::string& str, const std::string& str_, const Time& t, const Time& t_) {
     for (int i = 0; i < str.size(); i++) {
         station_name[i] = str[i];
     }
@@ -39,7 +39,7 @@ station::station(std::string str, std::string str_, Time t, Time t_) {
     time_arrival = t;
     time_leave = t_;
 }
-station::station(std::string str, train_id id_, Time t, Time t_) {
+station::station(const std::string& str, const train_id& id_, const Time& t, const Time& t_) {
     for (int i = 0; i < str.size(); i++) {
         station_name[i] = str[i];
     }
@@ -91,8 +91,8 @@ information::information() {
         prices[i] = 0;
     }
 }
-information::information(std::string num, std::string type_, std::string stations_,
-                         std::string sale_date, std::string price) {
+information::information(const std::string& num, const std::string& type_, const std::string& stations_,
+                         const std::string& sale_date, const std::string& price) {
     station_num = std::stoi(num);
     type = type_[0];
     std::string begin, end;
@@ -193,7 +193,7 @@ train_information::train_information() {
         }
     }
 }
-train_information::train_information(std::string str1, std::string str2, std::string str3, std::string str4) {
+train_information::train_information(const std::string& str1, const std::string& str2, const std::string& str3, const std::string& str4) {
     int num = std::stoi(str1);
     seat_num_initial = num;
     for (int i = 0; i < 100; i++) {
@@ -507,7 +507,7 @@ void sort_by_price_transfer(sjtu::vector<std::pair<std::pair<temp, temp>, int> >
     quick_sort(v, 0, v.size() - 1, compare_price_transfer);
 }
 
-sjtu::vector<temp> train_management::query_ticket_(std::string start, std::string end, date date_) {
+sjtu::vector<temp> train_management::query_ticket_(const std::string& start, const std::string& end, const date& date_) {
     std::string min_id, max_id;
     for (int i = 0; i < 20; i++) {
         min_id += '\0';
@@ -545,7 +545,7 @@ sjtu::vector<temp> train_management::query_ticket_(std::string start, std::strin
     }
     return train_satisfied;
 }
-sjtu::vector<std::pair<temp, int> > train_management::query_ticket__(std::string start, std::string end, date date_, Time time_) {
+sjtu::vector<std::pair<temp, int> > train_management::query_ticket__(const std::string& start, const std::string& end, const date& date_, const Time& time_) {
     std::string min_id, max_id;
     for (int i = 0; i < 20; i++) {
         min_id += '\0';
@@ -746,7 +746,7 @@ void train_management::query_transfer(const token_scanner& ts) {
     std::cout << seat_ << std::endl;
     return;
 }
-std::pair<date, int> train_management::query_buy(std::string start, std::string end, date date_, train_id id, int num, bool flag) {
+std::pair<date, int> train_management::query_buy(const std::string& start, const std::string& end, date date_, const train_id& id, int num, bool flag) {
     Time t;
     station start_(start, id, t, t);
     station end_(end, id, t, t);
@@ -790,7 +790,7 @@ std::pair<date, int> train_management::query_buy(std::string start, std::string 
         return {date_, 0};
     }
 }
-std::pair<Time, Time> train_management::query_time(const train_id& train, std::string station_) {
+std::pair<Time, Time> train_management::query_time(const train_id& train, const std::string& station_) {
     sjtu::vector<std::pair<train_id, long> > result_ = basic_information.find(train, train);
     information info;
     info.read_from_file(File_, result_[0].second);
@@ -808,7 +808,7 @@ std::pair<Time, Time> train_management::query_time(const train_id& train, std::s
     Time time_leave = info_.leaving_time[index];
     return {time_arrive, time_leave};
 }
-int train_management::query_price(const train_id& train, std::string begin, std::string end) {
+int train_management::query_price(const train_id& train, const std::string& begin, const std::string& end) {
     sjtu::vector<std::pair<train_id, long> > result_ = basic_information.find(train, train);
     information info;
     info.read_from_file(File_, result_[0].second);

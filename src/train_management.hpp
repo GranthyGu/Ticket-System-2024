@@ -15,7 +15,7 @@ class train_id {
 public:
     char id[21] = {0};
     train_id();
-    train_id(std::string);
+    train_id(const std::string&);
     train_id(const train_id&);
     train_id& operator=(const train_id&);
     bool operator<(const train_id&) const;
@@ -33,7 +33,7 @@ public:
     int prices[101] = {0};    // prefix_sum
     information();
     information(const information&);
-    information(std::string, std::string, std::string, std::string, std::string);
+    information(const std::string&, const std::string&, const std::string&, const std::string&, const std::string&);
     information& operator=(const information&);
     sjtu::vector<std::string> get_stations();
     void write_to_file(std::fstream& File, long pos);
@@ -49,7 +49,7 @@ public:
     Time arriving_time[101];   // arriving_time[i] saves the time to the ith station.
     Time leaving_time[101];    // leaving_time[i] saves the time leave the ith station.
     train_information();
-    train_information(std::string, std::string, std::string, std::string);
+    train_information(const std::string&, const std::string&, const std::string&, const std::string&);
     train_information(const train_information&);
     train_information& operator=(const train_information&);
     void write_to_file(std::fstream& File, long pos);
@@ -63,8 +63,8 @@ public:
     Time time_arrival;
     Time time_leave;
     station();
-    station(std::string, std::string, Time, Time);
-    station(std::string, train_id, Time, Time);
+    station(const std::string&, const std::string&, const Time&, const Time&);
+    station(const std::string&, const train_id&, const Time&, const Time&);
     station(const station&);
     station& operator=(const station&);
     bool operator<(const station&) const;
@@ -84,9 +84,9 @@ class train_management {
 private:
     B_plus_tree<train_id, long, 120, 100> basic_information;
     B_plus_tree<train_id, long, 120, 100> advanced_information;
-    B_plus_tree<station, std::pair<int, int>, 60, 50> released_station_train_id_list;
-    sjtu::vector<temp> query_ticket_(std::string, std::string, date);
-    sjtu::vector<std::pair<temp, int>> query_ticket__(std::string, std::string, date, Time time);
+    B_plus_tree<station, std::pair<int, int>, 40, 40> released_station_train_id_list;
+    sjtu::vector<temp> query_ticket_(const std::string&, const std::string&, const date&);
+    sjtu::vector<std::pair<temp, int>> query_ticket__(const std::string&, const std::string&, const date&, const Time&);
     std::fstream File;
     std::fstream File_;
 public:
@@ -98,9 +98,9 @@ public:
     void query_ticket(const token_scanner&);
     void query_transfer(const token_scanner&);
     void refund_ticket(const train_id&, std::string, std::string, date, int);
-    std::pair<date, int> query_buy(std::string, std::string, date, train_id, int, bool);
-    std::pair<Time, Time> query_time(const train_id&, std::string);
-    int query_price(const train_id&, std::string, std::string);
+    std::pair<date, int> query_buy(const std::string&, const std::string&, date, const train_id&, int, bool);
+    std::pair<Time, Time> query_time(const train_id&, const std::string&);
+    int query_price(const train_id&, const std::string&, const std::string&);
     void exit();
     void clear();
 };

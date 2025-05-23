@@ -7,7 +7,7 @@ username::username() {
         username_[i] = '\0';
     }
 }
-username::username(std::string str) {
+username::username(const std::string& str) {
     for (int i = 0; i < str.size(); i++) {
         username_[i] = str[i];
     }
@@ -38,7 +38,7 @@ password::password() {
         password_[i] = '\0';
     }
 }
-password::password(std::string str) {
+password::password(const std::string& str) {
     for (int i = 0; i < str.size(); i++) {
         password_[i] = str[i];
     }
@@ -60,7 +60,7 @@ name::name() {
         name_[i] = '\0';
     }
 }
-name::name(std::string str) {
+name::name(const std::string& str) {
     for (int i = 0; i < str.size(); i++) {
         name_[i] = str[i];
     }
@@ -82,7 +82,7 @@ mail_address::mail_address() {
         mail_address_[i] = '\0';
     }
 }
-mail_address::mail_address(std::string str) {
+mail_address::mail_address(const std::string& str) {
     for (int i = 0; i < str.size(); i++) {
         mail_address_[i] = str[i];
     }

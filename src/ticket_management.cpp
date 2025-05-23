@@ -3,7 +3,7 @@
 #include "ticket_management.hpp"
 
 key_for_ticket::key_for_ticket() {}
-key_for_ticket::key_for_ticket(int t, std::string str1, std::string str2) {
+key_for_ticket::key_for_ticket(const int& t, const std::string& str1, const std::string& str2) {
     time_ = t;
     train_id temp(str1);
     id = temp;
@@ -50,7 +50,7 @@ bool key_for_ticket::operator==(const key_for_ticket& other) const {
 }
 
 info_for_ticket::info_for_ticket() {}
-info_for_ticket::info_for_ticket(std::string d, std::string str1, std::string str2, std::string str3, std::string str4) {
+info_for_ticket::info_for_ticket(const std::string& d, const std::string& str1, const std::string& str2, const std::string& str3, const std::string& str4) {
     for (int i = 0; i < str1.size(); i++) {
         user_name[i] = str1[i];
     }
@@ -89,7 +89,7 @@ info_for_ticket& info_for_ticket::operator=(const info_for_ticket& other) {
 }
 
 key_for_ticket_user::key_for_ticket_user() {}
-key_for_ticket_user::key_for_ticket_user(int t, std::string str1) {
+key_for_ticket_user::key_for_ticket_user(const int& t, const std::string& str1) {
     time_ = t;
     for (int i = 0; i < 20; i++) {
         user_name[i] = str1[i];
@@ -123,7 +123,7 @@ bool key_for_ticket_user::operator==(const key_for_ticket_user& other) const {
 }
 
 info_for_ticket_user::info_for_ticket_user() {}
-info_for_ticket_user::info_for_ticket_user(std::string str1, std::string str2, std::string str3, std::string str4, std::string str5) {
+info_for_ticket_user::info_for_ticket_user(const std::string& str1, const std::string& str2, const std::string& str3, const std::string& str4, const std::string& str5) {
     train_id temp(str1);
     id = temp;
     date temp_(str2);

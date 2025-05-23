@@ -10,7 +10,7 @@ Time::Time(int h, int m) {
     hour = h; 
     minute = m;
 }
-Time::Time(std::string str) {
+Time::Time(const std::string& str) {
     std::string h, m;
     h += str[0];
     h += str[1];
@@ -89,7 +89,7 @@ date::date(int m, int d) {
     month = m;
     day = d;
 }
-date::date(std::string str) {
+date::date(const std::string& str) {
     std::string h, m;
     h += str[0];
     h += str[1];
