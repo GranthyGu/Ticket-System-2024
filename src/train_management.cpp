@@ -85,27 +85,6 @@ bool station::operator==(const station& other) const {
     }
     return id == other.id;
 }
-s_name::s_name() {}
-s_name::s_name(std::string other) {
-    for (int i = 0; i < other.size(); i++) {
-        station_name[i] = other[i];
-    }
-}
-s_name& s_name::operator=(const s_name& other) {
-    for (int i = 0; i < 31; i++) {
-        station_name[i] = other.station_name[i];
-    }
-    return *this;
-}
-bool s_name::operator<(const s_name& other) const {
-    return strcmp(station_name,other.station_name) < 0;
-}
-bool s_name::operator>(const s_name& other) const {
-    return strcmp(station_name,other.station_name) > 0;
-}
-bool s_name::operator==(const s_name& other) const {
-    return strcmp(station_name,other.station_name) == 0;
-}
 
 information::information() {
     for (int i = 0; i < 100; i++) {
@@ -269,11 +248,29 @@ train_information& train_information::operator=(const train_information& other) 
     released = other.released;
     return *this;
 }
+void train_information::write_to_file(std::fstream& File, long pos) {
+    if (!File) {return;}
+    File.seekp(pos);
+    File.write(reinterpret_cast<char*> (this), sizeof(*this));
+}
+void train_information::read_from_file(std::fstream& File, long pos) {
+    if (!File) {return;}
+    File.seekg(pos);
+    File.read(reinterpret_cast<char*> (this), sizeof(*this));
+}
 
 train_management::train_management() {
     basic_information.set_file_name("train_information_1");
-    advanced_information.set_file_name("train_information_2");
     released_station_train_id_list.set_file_name("train_released_list");
+    advanced_information.set_file_name("train_information_2");
+    File.open("file_for_train_information", std::ios::in | std::ios::out | std::ios::binary);
+    if (!File) {
+        File.clear();
+        File.open("file_for_train_information", std::ios::out | std::ios::binary);
+        File.close();
+        File.clear();
+        File.open("file_for_train_information", std::ios::in | std::ios::out | std::ios::binary);
+    }
 }
 void train_management::add_train(const token_scanner& ts) {
     std::string trainID, station_num_, seat_num_, stations_, prices_, start_time_,
@@ -310,15 +307,20 @@ void train_management::add_train(const token_scanner& ts) {
         return;
     }
     basic_information.insert(id, info);
-    advanced_information.insert(id, info_);
+    File.seekp(0, std::ios::end);
+    long pos = File.tellp();
+    info_.write_to_file(File, pos);
+    advanced_information.insert(id, pos);
     std::cout << '[' << ts.time << ']' << ' ' << 0 << std::endl;
     return;
 }
 void train_management::delete_train(const token_scanner& ts) {
     std::string ID = ts.key_argument[0].second;
     train_id id(ID);
-    sjtu::vector<std::pair<train_id, train_information> > v = advanced_information.find(id, id);
-    if (v.empty() || v[0].second.released == 1) {
+    sjtu::vector<std::pair<train_id, long> > v = advanced_information.find(id, id);
+    train_information info_;
+    info_.read_from_file(File, v[0].second);
+    if (v.empty() || info_.released == 1) {
         std::cout << '[' << ts.time << ']' << ' ' << -1 << std::endl;
         return;
     }
@@ -330,20 +332,20 @@ void train_management::delete_train(const token_scanner& ts) {
 void train_management::release_train(const token_scanner& ts) {
     std::string ID = ts.key_argument[0].second;
     train_id id(ID);
-    sjtu::vector<std::pair<train_id, train_information> > v = advanced_information.find(id, id);
+    sjtu::vector<std::pair<train_id, long> > v = advanced_information.find(id, id);
     sjtu::vector<std::pair<train_id, information> > v_ = basic_information.find(id, id);
-    if (v.empty() || v[0].second.released == 1) {
+    train_information info_t;
+    info_t.read_from_file(File, v[0].second);
+    if (v.empty() || info_t.released == 1) {
         std::cout << '[' << ts.time << ']' << ' ' << -1 << std::endl;
         return;
     }
     information info = v_[0].second;
-    train_information info_ = v[0].second;
-    advanced_information.remove(id);
-    info_.released = 1;
-    advanced_information.insert(id, info_);
+    info_t.released = 1;
+    info_t.write_to_file(File, v[0].second);
     sjtu::vector<std::string> station_info = info.get_stations();
     for (int i = 0; i < station_info.size(); i++) {
-        station station_(station_info[i], ID, info_.arriving_time[i], info_.leaving_time[i]);
+        station station_(station_info[i], ID, info_t.arriving_time[i], info_t.leaving_time[i]);
         released_station_train_id_list.insert(station_, std::make_pair(i, info.prices[i]));
     }
     std::cout << '[' << ts.time << ']' << ' ' << 0 << std::endl;
@@ -360,14 +362,15 @@ void train_management::query_train(const token_scanner& ts) {
     }
     train_id id(ID);
     date date_of_train(date_);
-    sjtu::vector<std::pair<train_id, train_information> > v = advanced_information.find(id, id);
+    sjtu::vector<std::pair<train_id, long> > v = advanced_information.find(id, id);
     sjtu::vector<std::pair<train_id, information> > v_ = basic_information.find(id, id);
+    train_information info_t;
+    info_t.read_from_file(File, v[0].second);
     if (v.empty()) {
         std::cout << '[' << ts.time << ']' << ' ' << -1 << std::endl;
         return;
     }
     information info = v_[0].second;
-    train_information info_ = v[0].second;
     if (info.sale_date_begin > date_of_train || info.sale_date_end < date_of_train) {
         std::cout << '[' << ts.time << ']' << ' ' << -1 << std::endl;
         return;
@@ -379,7 +382,7 @@ void train_management::query_train(const token_scanner& ts) {
         if (i == 0) {
             std::cout << "xx-xx xx:xx -> ";
         } else {
-            Time t = info_.arriving_time[i];
+            Time t = info_t.arriving_time[i];
             date day_ = date_of_train;
             day_.add_day(t.day);
             std::cout << day_.to_string() << ' ' << t.to_string() << " -> ";
@@ -387,7 +390,7 @@ void train_management::query_train(const token_scanner& ts) {
         if (i == info.station_num - 1) {
             std::cout << "xx-xx xx:xx ";
         } else {
-            Time t = info_.leaving_time[i];
+            Time t = info_t.leaving_time[i];
             date day_ = date_of_train;
             day_.add_day(t.day);
             std::cout << day_.to_string() << ' ' << t.to_string() << ' ';
@@ -397,7 +400,7 @@ void train_management::query_train(const token_scanner& ts) {
         if (i == info.station_num - 1) {
             std::cout << 'x' << std::endl;
         } else {
-            std::cout << info_.seat_num[i][delta] << std::endl;
+            std::cout << info_t.seat_num[i][delta] << std::endl;
         }
     }
 }
@@ -599,8 +602,9 @@ void train_management::query_ticket(const token_scanner& ts) {
                   << " -> " << train_satisfied[i].end.station_name << ' ';
         day.add_day(train_satisfied[i].end.time_arrival.day - train_satisfied[i].begin.time_leave.day);
         std::cout << day.to_string() << ' ' << train_satisfied[i].end.time_arrival.to_string() << ' ' << train_satisfied[i].price << ' ';
-        sjtu::vector<std::pair<train_id, train_information> > v = advanced_information.find(train_satisfied[i].begin.id, train_satisfied[i].begin.id);
-        train_information info_ = v[0].second;
+        sjtu::vector<std::pair<train_id, long> > v = advanced_information.find(train_satisfied[i].begin.id, train_satisfied[i].begin.id);
+        train_information info_;
+        info_.read_from_file(File, v[0].second);
         int seat_ = 1e9;
         int delta = day_.delta_day();
         for (int j = train_satisfied[i].index_begin; j < train_satisfied[i].index_end; j++) {
@@ -639,7 +643,8 @@ void train_management::query_transfer(const token_scanner& ts) {
     sjtu::vector<std::pair<station, std::pair<int, int> > > start_train = released_station_train_id_list.find(minimal_start, maximal_start);
     for (auto i : start_train) {
         sjtu::vector<std::pair<train_id, information>> temp_ = basic_information.find(i.first.id, i.first.id);
-        train_information info_ = advanced_information.find(i.first.id, i.first.id)[0].second;
+        train_information info_;
+        info_.read_from_file(File, advanced_information.find(i.first.id, i.first.id)[0].second);
         sjtu::vector<std::string> info = temp_[0].second.get_stations();
         int index = i.second.first;
         date initial_date = d;
@@ -666,10 +671,6 @@ void train_management::query_transfer(const token_scanner& ts) {
             }
         }
     }
-    // if (start == "福建省漳州市" && end == "河南省登封市")
-    // {
-    // }
-    
     if (train_satisfied.size() == 0) {
         std::cout << '[' << ts.time << ']' << ' ' << 0 << std::endl;
         return;
@@ -688,12 +689,12 @@ void train_management::query_transfer(const token_scanner& ts) {
                 << " -> " << train_satisfied[0].first.first.end.station_name << ' ';
     day.add_day(train_satisfied[0].first.first.end.time_arrival.day - train_satisfied[0].first.first.begin.time_arrival.day);
     std::cout << day.to_string() << ' ' << train_satisfied[0].first.first.end.time_arrival.to_string() << ' ' << train_satisfied[0].first.first.price << ' ';
-    sjtu::vector<std::pair<train_id, train_information> > v = advanced_information.find(train_satisfied[0].first.first.begin.id, train_satisfied[0].first.first.begin.id);
-    train_information info_ = v[0].second;
+    train_information info_t;
+    info_t.read_from_file(File, advanced_information.find(train_satisfied[0].first.first.begin.id, train_satisfied[0].first.first.begin.id)[0].second);
     int seat_ = 1e9;
     int delta = day_.delta_day();
     for (int j = train_satisfied[0].first.first.index_begin; j < train_satisfied[0].first.first.index_end; j++) {
-        seat_ = std::min(seat_, info_.seat_num[j][delta]);
+        seat_ = std::min(seat_, info_t.seat_num[j][delta]);
     }
     std::cout << seat_ << std::endl;
     std::cout << train_satisfied[0].first.second.begin.id.id << ' ' << train_satisfied[0].first.second.begin.station_name << ' ';
@@ -704,12 +705,12 @@ void train_management::query_transfer(const token_scanner& ts) {
                 << " -> " << train_satisfied[0].first.second.end.station_name << ' ';
     day.add_day(train_satisfied[0].first.second.end.time_arrival.day - train_satisfied[0].first.second.begin.time_arrival.day);
     std::cout << day.to_string() << ' ' << train_satisfied[0].first.second.end.time_arrival.to_string() << ' ' << train_satisfied[0].first.second.price << ' ';
-    sjtu::vector<std::pair<train_id, train_information> > v_ = advanced_information.find(train_satisfied[0].first.second.begin.id, train_satisfied[0].first.second.begin.id);
-    train_information info__ = v_[0].second;
+    train_information info_tt;
+    info_tt.read_from_file(File, advanced_information.find(train_satisfied[0].first.second.begin.id, train_satisfied[0].first.second.begin.id)[0].second);
     seat_ = 1e9;
     delta = day_.delta_day();
     for (int j = train_satisfied[0].first.second.index_begin; j < train_satisfied[0].first.second.index_end; j++) {
-        seat_ = std::min(seat_, info__.seat_num[j][delta]);
+        seat_ = std::min(seat_, info_tt.seat_num[j][delta]);
     }
     std::cout << seat_ << std::endl;
     return;
@@ -736,17 +737,18 @@ std::pair<date, int> train_management::query_buy(std::string start, std::string 
         return {date(), -1};
     }
     int delta_date = date_.delta_day();
-    sjtu::vector<std::pair<train_id, train_information> > find_result = advanced_information.find(id, id);
+    train_information info_;
+    long pos = advanced_information.find(id, id)[0].second;
+    info_.read_from_file(File, pos);
     int minimal = 1e9;
     for (int i = start_train[0].second.first; i < end_train[0].second.first; i++) {
-        minimal = std::min(minimal, find_result[0].second.seat_num[i][delta_date]);
+        minimal = std::min(minimal, info_.seat_num[i][delta_date]);
     }
     if (minimal >= num){
         for (int i = start_train[0].second.first; i < end_train[0].second.first; i++) {
-            find_result[0].second.seat_num[i][delta_date] -= num;
+            info_.seat_num[i][delta_date] -= num;
         }
-        advanced_information.remove(id);
-        advanced_information.insert(id, find_result[0].second);
+        info_.write_to_file(File, pos);
         int price_ = end_train[0].second.second - start_train[0].second.second;
         return {date_, price_ * num};
     } else {
@@ -755,7 +757,9 @@ std::pair<date, int> train_management::query_buy(std::string start, std::string 
 }
 std::pair<Time, Time> train_management::query_time(const train_id& train, std::string station_) {
     sjtu::vector<std::pair<train_id, information> > result_ = basic_information.find(train, train);
-    sjtu::vector<std::pair<train_id, train_information> > result = advanced_information.find(train, train);
+    train_information info_;
+    long pos = advanced_information.find(train, train)[0].second;
+    info_.read_from_file(File, pos);
     sjtu::vector<std::string> stations = result_[0].second.get_stations();
     int index;
     for (index = 0; index < stations.size(); index++) {
@@ -763,13 +767,12 @@ std::pair<Time, Time> train_management::query_time(const train_id& train, std::s
             break;
         }
     }
-    Time time_arrive = result[0].second.arriving_time[index];
-    Time time_leave = result[0].second.leaving_time[index];
+    Time time_arrive = info_.arriving_time[index];
+    Time time_leave = info_.leaving_time[index];
     return {time_arrive, time_leave};
 }
 int train_management::query_price(const train_id& train, std::string begin, std::string end) {
     sjtu::vector<std::pair<train_id, information> > result_ = basic_information.find(train, train);
-    sjtu::vector<std::pair<train_id, train_information> > result = advanced_information.find(train, train);
     sjtu::vector<std::string> stations = result_[0].second.get_stations();
     int index, index_;
     for (int i = 0; i < stations.size(); i++) {
@@ -784,10 +787,11 @@ int train_management::query_price(const train_id& train, std::string begin, std:
 }
 void train_management::refund_ticket(const train_id& train, std::string begin, std::string end, date day, int num) {
     sjtu::vector<std::pair<train_id, information> > result_ = basic_information.find(train, train);
-    sjtu::vector<std::pair<train_id, train_information> > result = advanced_information.find(train, train);
+    train_information info;
+    long pos = advanced_information.find(train, train)[0].second;
+    info.read_from_file(File, pos);
     sjtu::vector<std::string> stations = result_[0].second.get_stations();
     int index, index_;
-    train_information info = result[0].second;
     for (int i = 0; i < stations.size(); i++) {
         if (stations[i] == begin) {
             index = i;
@@ -801,8 +805,7 @@ void train_management::refund_ticket(const train_id& train, std::string begin, s
     for (int i = index; i < index_; i++) {
         info.seat_num[i][delta] += num;
     }
-    advanced_information.remove(train);
-    advanced_information.insert(train, info);
+    info.write_to_file(File, pos);
 }
 void train_management::exit() {
     basic_information.~B_plus_tree();

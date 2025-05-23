@@ -49,6 +49,8 @@ public:
     train_information(std::string, std::string, std::string, std::string);
     train_information(const train_information&);
     train_information& operator=(const train_information&);
+    void write_to_file(std::fstream& File, long pos);
+    void read_from_file(std::fstream& File, long pos);
 };
 
 class station {
@@ -66,16 +68,6 @@ public:
     bool operator>(const station&) const;
     bool operator==(const station&) const;
 };
-class s_name {
-public:
-    char station_name[31] = {0};
-    s_name();
-    s_name(std::string);
-    s_name& operator=(const s_name&);
-    bool operator<(const s_name&) const;
-    bool operator>(const s_name&) const;
-    bool operator==(const s_name&) const;
-};
 struct temp {
     station begin;
     station end;
@@ -88,10 +80,11 @@ struct temp {
 class train_management {
 private:
     B_plus_tree<train_id, information, 120, 3> basic_information;
-    B_plus_tree<train_id, train_information, 120, 3> advanced_information;
+    B_plus_tree<train_id, long, 120, 3> advanced_information;
     B_plus_tree<station, std::pair<int, int>, 60, 50> released_station_train_id_list;
     sjtu::vector<temp> query_ticket_(std::string, std::string, date);
     sjtu::vector<std::pair<temp, int>> query_ticket__(std::string, std::string, date, Time time);
+    std::fstream File;
 public:
     train_management();
     void add_train(const token_scanner&);
