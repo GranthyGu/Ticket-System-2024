@@ -132,6 +132,10 @@ void date::add_day(int d) {
         day = (cur_day - 1) % 30 + 1;
         if (month == 8) {
             day--;
+            if (day == 0) {
+                month = 7;
+                day = 31;
+            }
         }
     } else {
         month += (cur_day - 1) / 31;
@@ -170,6 +174,8 @@ int date::delta_day() const {
     int delta_day = day - 1;
     if (delta_month == 2) {
         return 61 + delta_day;
+    } else if (delta_month == -1) {
+        return day - 32;
     } else {
         return delta_month * 30 + delta_day;
     }
