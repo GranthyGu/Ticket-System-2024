@@ -195,6 +195,7 @@ train_information::train_information() {
 }
 train_information::train_information(std::string str1, std::string str2, std::string str3, std::string str4) {
     int num = std::stoi(str1);
+    seat_num_initial = num;
     for (int i = 0; i < 100; i++) {
         for (int j = 0; j < 92; j++) {
             seat_num[i][j] = num;
@@ -245,6 +246,7 @@ train_information::train_information(const train_information& other) {
         leaving_time[i] = other.leaving_time[i];
     }
     start_time = other.start_time;
+    seat_num_initial = other.seat_num_initial;
     released = other.released;
 }
 train_information& train_information::operator=(const train_information& other) {
@@ -256,6 +258,7 @@ train_information& train_information::operator=(const train_information& other) 
         leaving_time[i] = other.leaving_time[i];
     }
     start_time = other.start_time;
+    seat_num_initial = other.seat_num_initial;
     released = other.released;
     return *this;
 }
@@ -770,6 +773,9 @@ std::pair<date, int> train_management::query_buy(std::string start, std::string 
     long pos = advanced_information.find(id, id)[0].second;
     info_.read_from_file(File, pos);
     int minimal = 1e9;
+    if (info_.seat_num_initial < num) {
+        return {date(), -1};
+    }
     for (int i = start_train[0].second.first; i < end_train[0].second.first; i++) {
         minimal = std::min(minimal, info_.seat_num[i][delta_date]);
     }

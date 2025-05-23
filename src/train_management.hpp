@@ -42,6 +42,7 @@ public:
 
 class train_information{
 public:
+    int seat_num_initial = 0;
     int released = 0;
     int seat_num[100][92];
     Time start_time;
