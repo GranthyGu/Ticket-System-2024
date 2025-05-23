@@ -79,10 +79,10 @@ public:
 struct temp {
     station begin;
     station end;
-    int time_;
-    int price;
-    int index_begin;
-    int index_end;
+    int time_ = 0;
+    int price = 0;
+    int index_begin = -1;
+    int index_end = -1;
 };
 
 class train_management {
@@ -90,8 +90,6 @@ private:
     B_plus_tree<train_id, information, 120, 3> basic_information;
     B_plus_tree<train_id, train_information, 120, 3> advanced_information;
     B_plus_tree<station, std::pair<int, int>, 60, 50> released_station_train_id_list;
-    B_plus_tree<int, s_name, 100, 60> station_name;
-    int num = 1;
     sjtu::vector<temp> query_ticket_(std::string, std::string, date);
     sjtu::vector<std::pair<temp, int>> query_ticket__(std::string, std::string, date, Time time);
 public:

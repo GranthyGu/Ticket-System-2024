@@ -274,8 +274,6 @@ train_management::train_management() {
     basic_information.set_file_name("train_information_1");
     advanced_information.set_file_name("train_information_2");
     released_station_train_id_list.set_file_name("train_released_list");
-    station_name.set_file_name("station_names");
-    num = station_name.size() + 1;
 }
 void train_management::add_train(const token_scanner& ts) {
     std::string trainID, station_num_, seat_num_, stations_, prices_, start_time_,
@@ -345,8 +343,6 @@ void train_management::release_train(const token_scanner& ts) {
     advanced_information.insert(id, info_);
     sjtu::vector<std::string> station_info = info.get_stations();
     for (int i = 0; i < station_info.size(); i++) {
-        bool flag = station_name.insert(num, s_name(station_info[i]));
-        num += flag;
         station station_(station_info[i], ID, info_.arriving_time[i], info_.leaving_time[i]);
         released_station_train_id_list.insert(station_, std::make_pair(i, info.prices[i]));
     }
@@ -547,7 +543,7 @@ sjtu::vector<std::pair<temp, int> > train_management::query_ticket__(std::string
                     int t = train_end.time_arrival - train.time_leave;
                     int index_begin = start_train[i].second.first;
                     int index_end = end_train[j].second.first;
-                    int day_;
+                    int day_ = 0;
                     if (info.sale_date_begin > d) {
                         day_ = info.sale_date_begin.delta_day() - d.delta_day();
                     } else {
@@ -577,6 +573,12 @@ void train_management::query_ticket(const token_scanner& ts) {
         }
     }
     date d(date_);
+    date minimal_d("06-01");
+    date maximal_d("08-31");
+    if (d < minimal_d || d > maximal_d) {
+        std::cout << '[' << ts.time << ']' << ' ' << 0 << std::endl;
+        return;
+    }
     sjtu::vector<temp> train_satisfied = query_ticket_(start, end, d);
     if (train_satisfied.empty()) {
         std::cout << '[' << ts.time << ']' << ' ' << 0 << std::endl;
@@ -621,30 +623,53 @@ void train_management::query_transfer(const token_scanner& ts) {
         }
     }
     date d(date_);
+    date minimal_d("06-01");
+    date maximal_d("08-31");
+    if (d < minimal_d || d > maximal_d) {
+        std::cout << '[' << ts.time << ']' << ' ' << 0 << std::endl;
+        return;
+    }
     sjtu::vector<std::pair<std::pair<temp, temp>, int> > train_satisfied;
-    for (int i = 1; i <= num; i++) {
-        sjtu::vector<std::pair<int, s_name> > stations = station_name.find(i, i);
-        if (stations.empty()) {
+    std::string min_id, max_id;
+    for (int i = 0; i < 20; i++) {
+        min_id += '\0';
+        max_id += '~';
+    }
+    station minimal_start(start, min_id, Time(), Time()), maximal_start(start, max_id, Time(), Time());
+    sjtu::vector<std::pair<station, std::pair<int, int> > > start_train = released_station_train_id_list.find(minimal_start, maximal_start);
+    for (auto i : start_train) {
+        sjtu::vector<std::pair<train_id, information>> temp_ = basic_information.find(i.first.id, i.first.id);
+        train_information info_ = advanced_information.find(i.first.id, i.first.id)[0].second;
+        sjtu::vector<std::string> info = temp_[0].second.get_stations();
+        int index = i.second.first;
+        date initial_date = d;
+        initial_date.minus_day(info_.leaving_time[index].day);
+        if (initial_date < temp_[0].second.sale_date_begin || initial_date > temp_[0].second.sale_date_end){
             continue;
         }
-        std::string station_(stations[0].second.station_name);
-        if (station_ == start || station_ == end) {
-            continue;
-        }
-        sjtu::vector<temp> train_satisfied_first = query_ticket_(start, station_, d);
-        for (int j = 0; j < train_satisfied_first.size(); j++) {
-            temp train_ = train_satisfied_first[j];
-            date arrive_transfer_date(date_);
-            arrive_transfer_date.add_day(train_.end.time_arrival.day - train_.begin.time_leave.day);
-            sjtu::vector<std::pair<temp, int> > train_satisfied_second = query_ticket__(station_, end, arrive_transfer_date, train_.end.time_arrival);
-            for (int k = 0; k < train_satisfied_second.size(); k++) {
-                if (train_.begin.id == train_satisfied_second[k].first.begin.id) {
+        for (int j = index + 1; j < info.size(); j++) {
+            std::string station_info = info[j];
+            date cur_date = d;
+            cur_date.minus_day(info_.leaving_time[index].day);
+            cur_date.add_day(info_.arriving_time[j].day);
+            Time t = info_.arriving_time[j];
+            sjtu::vector<std::pair<temp, int> > end_train = query_ticket__(station_info, end, cur_date, t);
+            for (auto k : end_train) {
+                if (k.first.begin.id == i.first.id) {
                     continue;
                 }
-                train_satisfied.push_back({{train_, train_satisfied_second[k].first}, train_satisfied_second[k].second});
+                station first_end(station_info, i.first.id, info_.arriving_time[j], info_.leaving_time[j]);
+                int time_tmp = info_.arriving_time[j] - info_.leaving_time[index];
+                int price_ = temp_[0].second.prices[j] - temp_[0].second.prices[index];
+                temp tt = {i.first, first_end, time_tmp, price_, index, j};
+                train_satisfied.push_back({{tt, k.first}, k.second});
             }
         }
     }
+    // if (start == "福建省漳州市" && end == "河南省登封市")
+    // {
+    // }
+    
     if (train_satisfied.size() == 0) {
         std::cout << '[' << ts.time << ']' << ' ' << 0 << std::endl;
         return;
@@ -783,11 +808,9 @@ void train_management::exit() {
     basic_information.~B_plus_tree();
     advanced_information.~B_plus_tree();
     released_station_train_id_list.~B_plus_tree();
-    station_name.~B_plus_tree();
 }
 void train_management::clear() {
     basic_information.clear();
     advanced_information.clear();
     released_station_train_id_list.clear();
-    station_name.clear();
 }

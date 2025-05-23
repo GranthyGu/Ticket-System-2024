@@ -70,7 +70,7 @@ std::string Time::to_string() const {
     time_ += std::to_string(minute);
     return time_;
 }
-int Time::operator-(const Time& other) {
+int Time::operator-(const Time& other) const {
     int ans = 0;
     int delta_d = day - other.day;
     ans += delta_d * 1440;

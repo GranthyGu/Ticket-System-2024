@@ -20,7 +20,7 @@ public:
     bool operator>(const Time&) const;
     void add_minute(int);
     std::string to_string() const;
-    int operator-(const Time&);
+    int operator-(const Time&) const;
 };
 class date {
 public:
