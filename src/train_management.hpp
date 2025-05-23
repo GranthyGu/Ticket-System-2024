@@ -36,6 +36,8 @@ public:
     information(std::string, std::string, std::string, std::string, std::string);
     information& operator=(const information&);
     sjtu::vector<std::string> get_stations();
+    void write_to_file(std::fstream& File, long pos);
+    void read_from_file(std::fstream& File, long pos);
 };
 
 class train_information{
@@ -79,12 +81,13 @@ struct temp {
 
 class train_management {
 private:
-    B_plus_tree<train_id, information, 120, 3> basic_information;
-    B_plus_tree<train_id, long, 120, 3> advanced_information;
+    B_plus_tree<train_id, long, 120, 100> basic_information;
+    B_plus_tree<train_id, long, 120, 100> advanced_information;
     B_plus_tree<station, std::pair<int, int>, 60, 50> released_station_train_id_list;
     sjtu::vector<temp> query_ticket_(std::string, std::string, date);
     sjtu::vector<std::pair<temp, int>> query_ticket__(std::string, std::string, date, Time time);
     std::fstream File;
+    std::fstream File_;
 public:
     train_management();
     void add_train(const token_scanner&);
