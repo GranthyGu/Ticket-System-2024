@@ -130,6 +130,9 @@ void date::add_day(int d) {
     if (month == 6) {
         month += (cur_day - 1) / 30;
         day = (cur_day - 1) % 30 + 1;
+        if (month == 8) {
+            day--;
+        }
     } else {
         month += (cur_day - 1) / 31;
         day = (cur_day - 1) % 31 + 1;

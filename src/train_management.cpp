@@ -734,7 +734,7 @@ void train_management::query_transfer(const token_scanner& ts) {
     day_.minus_day(train_satisfied[0].first.second.begin.time_leave.day);
     std::cout << day.to_string() << ' ' << train_satisfied[0].first.second.begin.time_leave.to_string() 
                 << " -> " << train_satisfied[0].first.second.end.station_name << ' ';
-    day.add_day(train_satisfied[0].first.second.end.time_arrival.day - train_satisfied[0].first.second.begin.time_arrival.day);
+    day.add_day(train_satisfied[0].first.second.end.time_arrival.day - train_satisfied[0].first.second.begin.time_leave.day);
     std::cout << day.to_string() << ' ' << train_satisfied[0].first.second.end.time_arrival.to_string() << ' ' << train_satisfied[0].first.second.price << ' ';
     train_information info_tt;
     info_tt.read_from_file(File, advanced_information.find(train_satisfied[0].first.second.begin.id, train_satisfied[0].first.second.begin.id)[0].second);
