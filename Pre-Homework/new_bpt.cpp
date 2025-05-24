@@ -533,7 +533,7 @@ public:
         while (index < node.size && node.key[index] < minimal) {index++;}
         while (true) {
             while (index < node.size && (node.key[index] < maximal || node.key[index] == maximal)) {
-                values.push_back({node.key[index], node.key[index]});
+                values.push_back({node.key[index], '0'});
                 index++;
             }
             if (node.address_of_right_node == -1 || node.key[node.size - 1] > maximal) {
