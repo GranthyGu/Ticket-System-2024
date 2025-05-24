@@ -16,7 +16,7 @@ private:
     sjtu::list<Node> lru_list;
     sjtu::unordered_map<Key, ListIterator> cache;
 public:
-    explicit LRU(std::size_t cap = 2500) : capacity(cap) {}
+    explicit LRU(std::size_t cap = 2000) : capacity(cap) {}
     bool contains(const Key& key) const {
         return cache.find(key) != nullptr;
     }
