@@ -3,83 +3,98 @@
 #include <fstream>
 #include <vector>
 #include <climits>
+#include "LRU.hpp"
 
-template<typename T, const int M, const int L>
-class Node {
-public:
-    int is_leaf;
-    int size;
-    T key[M + 1] = {};
-    long address_of_children[M + 1] = {-1};
-    long address_of_parent;
-    Node() : is_leaf(0), size(0), address_of_parent(-1) {}
-    Node(int leaf, int size, T* key_, long* add, long add_parent) : is_leaf(leaf), size(size), address_of_parent(add_parent) {
-        for (int i = 0; i < M; i++) {
-            key[i] = key_[i];
-            address_of_children[i] = add[i];
-        }
-    }
-    Node<T, M, L>& operator=(const Node<T, M, L>& other) {
-        this->is_leaf = other.is_leaf;
-        this->size = other.size;
-        this->address_of_parent = other.address_of_parent;
-        for (int i = 0; i <= M; i++) {
-            this->key[i] = other.key[i];
-            this->address_of_children[i] = other.address_of_children[i];
-        }
-        return *this;
-    }
-    void write_to_file(std::fstream& File) {
-        if (!File) {return;}
-        File.write(reinterpret_cast<char*> (this), sizeof(*this));
-    }
-    void read_from_file(std::fstream& File) {
-        if (!File) {return;}
-        File.read(reinterpret_cast<char*> (this), sizeof(*this));
-    }
-};
-template<typename T, typename V, const int M, const int L>
-class leaf_Node {
-public:
-    int size;
-    T key[L + 1] = {};
-    V value[L + 1] = {};
-    long address_of_parent;
-    long address_of_right_node;
-    leaf_Node() : size(0), address_of_right_node(-1), address_of_parent(-1) {}
-    leaf_Node(int size, T* key_, V* value_, long* add, long add_, long add_parent) : size(size), address_of_right_node(add_), address_of_parent(add_parent) {
-        for (int i = 0; i <= L; i++) {
-            key[i] = key_[i];
-            value[i] = value_[i];
-        }
-    }
-    leaf_Node<T, V, M, L>& operator=(const leaf_Node<T, V, M, L>& other) {
-        this->size = other.size;
-        this->address_of_right_node = other.address_of_right_node;
-        this->address_of_parent = other.address_of_parent;
-        for (int i = 0; i < L; i++) {
-            this->key[i] = other.key[i];
-            this->value[i] = other.value[i];
-        }
-        return *this;
-    }
-    void write_to_file(std::fstream& File) {
-        if (!File) {return;}
-        File.write(reinterpret_cast<char*> (this), sizeof(*this));
-    }
-    void read_from_file(std::fstream& File) {
-        if (!File) {return;}
-        File.read(reinterpret_cast<char*> (this), sizeof(*this));
-    }
-};
 template<typename T, typename V, const int M, const int L>
 class B_plus_tree {
 private:
+    class Node;
+    class leaf_Node;
     std::string file_name;
     std::fstream File;
     long address_of_root;
+    LRU<long, Node> LRU_node;
+    LRU<long, leaf_Node> LRU_leaf_node;
+    class Node {
+    public:
+        int is_leaf;
+        int size;
+        T key[M + 1] = {};
+        long address_of_children[M + 1] = {-1};
+        long address_of_parent;
+        Node() : is_leaf(0), size(0), address_of_parent(-1) {}
+        Node(int leaf, int size, T* key_, long* add, long add_parent) : is_leaf(leaf), size(size), address_of_parent(add_parent) {
+            for (int i = 0; i < M; i++) {
+                key[i] = key_[i];
+                address_of_children[i] = add[i];
+            }
+        }
+        Node& operator=(const Node& other) {
+            this->is_leaf = other.is_leaf;
+            this->size = other.size;
+            this->address_of_parent = other.address_of_parent;
+            for (int i = 0; i <= M; i++) {
+                this->key[i] = other.key[i];
+                this->address_of_children[i] = other.address_of_children[i];
+            }
+            return *this;
+        }
+    };
+    class leaf_Node {
+    public:
+        int size;
+        T key[L + 1] = {};
+        V value[L + 1] = {};
+        long address_of_parent;
+        long address_of_right_node;
+        leaf_Node() : size(0), address_of_right_node(-1), address_of_parent(-1) {}
+        leaf_Node(int size, T* key_, V* value_, long* add, long add_, long add_parent) : size(size), address_of_right_node(add_), address_of_parent(add_parent) {
+            for (int i = 0; i <= L; i++) {
+                key[i] = key_[i];
+                value[i] = value_[i];
+            }
+        }
+        leaf_Node& operator=(const leaf_Node& other) {
+            this->size = other.size;
+            this->address_of_right_node = other.address_of_right_node;
+            this->address_of_parent = other.address_of_parent;
+            for (int i = 0; i < L; i++) {
+                this->key[i] = other.key[i];
+                this->value[i] = other.value[i];
+            }
+            return *this;
+        }
+    };
+    void write_to_file1(const long& pos, Node& node) {
+        if (!File) {return;}
+        File.seekp(pos);
+        File.write(reinterpret_cast<char*> (&node), sizeof(Node));
+        LRU_node.put(pos, node);
+    }
+    void read_from_file1(const long& pos, Node& node) {
+        if (LRU_node.get(pos, node)) {
+            return;
+        }
+        File.seekg(pos);
+        if (!File) {return;}
+        File.read(reinterpret_cast<char*> (&node), sizeof(Node));
+    }
+    void write_to_file2(const long& pos, leaf_Node& node) {
+        if (!File) {return;}
+        File.seekp(pos);
+        File.write(reinterpret_cast<char*> (&node), sizeof(leaf_Node));
+        LRU_leaf_node.put(pos, node);
+    }
+    void read_from_file2(const long& pos, leaf_Node& node) {
+        if (LRU_leaf_node.get(pos, node)) {
+            return;
+        }
+        File.seekg(pos);
+        if (!File) {return;}
+        File.read(reinterpret_cast<char*> (&node), sizeof(leaf_Node));
+    }
     // To find the index in node.key, which is the first element less than target. If not exist, return -1.
-    int binary_find(Node<T, M, L> node, T target) {
+    int binary_find(Node node, T target) {
         T* arr = node.key;
         int left = 0;
         int right = node.size;
@@ -93,7 +108,7 @@ private:
         }
         return left - 1;
     }
-    int binary_find_value(leaf_Node<T, V, M, L> node, T target) {
+    int binary_find_value(leaf_Node node, T target) {
         T* arr = node.key;
         int left = 0;
         int right = node.size;
@@ -109,12 +124,10 @@ private:
     }
     void recall_for_insert(long address, bool flag) {
         if (flag) {
-            leaf_Node<T, V, M, L> parent;
-            File.seekg(address);
-            parent.read_from_file(File);
-            Node<T, M, L> parent_parent;
-            File.seekg(parent.address_of_parent);
-            parent_parent.read_from_file(File);
+            leaf_Node parent;
+            read_from_file2(address, parent);
+            Node parent_parent;
+            read_from_file1(parent.address_of_parent, parent_parent);
             int index;
             for (int i = 0; i <= parent_parent.size; i++) {
                 if (parent_parent.address_of_children[i] == address) {
@@ -125,25 +138,22 @@ private:
             long address_parent = parent.address_of_parent;
             split_node(address_parent, index);
         } else {
-            Node<T, M, L> parent;
-            File.seekg(address);
-            parent.read_from_file(File);
+            Node parent;
+            read_from_file1(address, parent);
             if (parent.address_of_parent == -1) {   // Which means that the parent node is the root.
-                Node<T, M, L> new_root;
+                Node new_root;
                 new_root.address_of_children[0] = address;
                 new_root.address_of_parent = -1;
                 File.seekp(0, std::ios::end);
                 long root_address = File.tellp();
-                new_root.write_to_file(File);
+                write_to_file1(root_address, new_root);
                 address_of_root = root_address;
                 parent.address_of_parent = root_address;
-                File.seekp(address);
-                parent.write_to_file(File);
+                write_to_file1(address, parent);
                 split_node(root_address, 0);
             } else {
-                Node<T, M, L> parent_parent;
-                File.seekg(parent.address_of_parent);
-                parent_parent.read_from_file(File);
+                Node parent_parent;
+                read_from_file1(parent.address_of_parent, parent_parent);
                 int index;
                 for (int i = 0; i <= parent_parent.size; i++) {
                     if (parent_parent.address_of_children[i] == address) {
@@ -158,14 +168,12 @@ private:
     }
     // Split the ith child of the parent node.
     void split_node(long address, int k) {
-        File.seekg(address);
-        Node<T, M, L> parent;
-        parent.read_from_file(File);
+        Node parent;
+        read_from_file1(address, parent);
         if (parent.is_leaf == 1) {
-            leaf_Node<T, V, M, L> child;
-            File.seekg(parent.address_of_children[k]);
-            child.read_from_file(File);
-            leaf_Node<T, V, M, L> new_node;
+            leaf_Node child;
+            read_from_file2(parent.address_of_children[k], child);
+            leaf_Node new_node;
             new_node.address_of_parent = child.address_of_parent;
             File.seekp(0, std::ios::end);
             long address_last = File.tellp();
@@ -177,9 +185,8 @@ private:
                 new_node.key[i] = child.key[i + child.size];
                 new_node.value[i] = child.value[i + child.size];
             }
-            new_node.write_to_file(File);
-            File.seekp(parent.address_of_children[k]);
-            child.write_to_file(File);
+            write_to_file2(address_last, new_node);
+            write_to_file2(parent.address_of_children[k], child);
             for (int i = parent.size; i > k; i--) {
                 parent.key[i] = parent.key[i - 1];
                 parent.address_of_children[i + 1] = parent.address_of_children[i];
@@ -187,10 +194,9 @@ private:
             parent.key[k] = child.key[child.size];
             parent.address_of_children[k + 1] = address_last;
         } else {
-            Node<T, M, L> child;
-            File.seekg(parent.address_of_children[k]);
-            child.read_from_file(File);
-            Node<T, M, L> new_node;
+            Node child;
+            read_from_file1(parent.address_of_children[k], child);
+            Node new_node;
             new_node.is_leaf = child.is_leaf;
             new_node.address_of_parent = child.address_of_parent;
             File.seekp(0, std::ios::end);
@@ -202,24 +208,19 @@ private:
                 new_node.address_of_children[i] = child.address_of_children[i + child.size + 1];
             }
             new_node.address_of_children[new_node.size] = child.address_of_children[new_node.size + child.size + 1];
-            new_node.write_to_file(File);
-            File.seekp(parent.address_of_children[k]);
-            child.write_to_file(File);
+            write_to_file1(address_last, new_node);
+            write_to_file1(parent.address_of_children[k], child);
             for (int i = 0; i <= new_node.size; i++) {
                 if (new_node.is_leaf == 1) {
-                    File.seekg(new_node.address_of_children[i]);
-                    leaf_Node<T, V, M, L> tmp;
-                    tmp.read_from_file(File);
+                    leaf_Node tmp;
+                    read_from_file2(new_node.address_of_children[i], tmp);
                     tmp.address_of_parent = address_last;
-                    File.seekp(new_node.address_of_children[i]);
-                    tmp.write_to_file(File);
+                    write_to_file2(new_node.address_of_children[i], tmp);
                 } else {
-                    File.seekg(new_node.address_of_children[i]);
-                    Node<T, M, L> tmp;
-                    tmp.read_from_file(File);
+                    Node tmp;
+                    read_from_file1(new_node.address_of_children[i], tmp);
                     tmp.address_of_parent = address_last;
-                    File.seekp(new_node.address_of_children[i]);
-                    tmp.write_to_file(File);
+                    write_to_file1(new_node.address_of_children[i], tmp);
                 }
             }
             for (int i = parent.size; i > k; i--) {
@@ -230,8 +231,7 @@ private:
             parent.address_of_children[k + 1] = address_last;
         }
         parent.size++;
-        File.seekp(address);
-        parent.write_to_file(File);
+        write_to_file1(address, parent);
         if (parent.size > M - 1) {
             recall_for_insert(address, false);
         }
@@ -239,9 +239,8 @@ private:
     }
     // Insert the certain value to the certain node(found by the address of itself).
     bool insert_to_bpt(long address, const T& k, const V& v) {
-        File.seekg(address);
-        leaf_Node<T, V, M, L> node;
-        node.read_from_file(File);
+        leaf_Node node;
+        read_from_file2(address, node);
         int index = binary_find_value(node, k);
         if (index != -1 && node.key[index] == k) {
             return false;
@@ -253,8 +252,7 @@ private:
         node.key[index + 1] = k;
         node.value[index + 1] = v;
         node.size++;
-        File.seekp(address);
-        node.write_to_file(File);
+        write_to_file2(address, node);
         if (node.size >= L) {
             recall_for_insert(address, true);
         }
@@ -262,16 +260,14 @@ private:
     }
     // For certain T, find its corresponding leaf. Begin the finding from the root, stop at the leaf.
     long find_corresponding_leaf(const T& value) {
-        Node<T, M, L> node;
-        File.seekg(address_of_root);
+        Node node;
         long address = address_of_root;
-        node.read_from_file(File);
+        read_from_file1(address_of_root, node);
         while (true) {
             int index = binary_find(node, value);
-            File.seekg(node.address_of_children[index + 1]);
             address = node.address_of_children[index + 1];
             if (node.is_leaf == 0) {
-                node.read_from_file(File);
+                read_from_file1(node.address_of_children[index + 1], node);
             } else {
                 break;
             }
@@ -280,18 +276,15 @@ private:
     }
     // Usually, we will merge the node with the right one. However, for the last node, merge it with the left one.
     void merge_node(long address, int k) {
-        File.seekg(address);
-        Node<T, M, L> parent;
-        parent.read_from_file(File);
+        Node parent;
+        read_from_file1(address, parent);
         if (k == parent.size) {k--;}
         if (k < 0) {return;}
         if (parent.is_leaf == 1) {
-            leaf_Node<T, V, M, L> child;
-            File.seekg(parent.address_of_children[k]);
-            child.read_from_file(File);
-            leaf_Node<T, V, M, L> right_child;
-            File.seekg(parent.address_of_children[k + 1]);
-            right_child.read_from_file(File);
+            leaf_Node child;
+            read_from_file2(parent.address_of_children[k], child);
+            leaf_Node right_child;
+            read_from_file2(parent.address_of_children[k + 1], right_child);
             int total_size = right_child.size + child.size;
             if (total_size <= L - 1) {
                 for (int i = 0; i < right_child.size; i++) {
@@ -305,10 +298,8 @@ private:
                     parent.address_of_children[i + 1] = parent.address_of_children[i + 2];
                 }
                 parent.size--;
-                File.seekp(address);
-                parent.write_to_file(File);
-                File.seekp(parent.address_of_children[k]);
-                child.write_to_file(File);
+                write_to_file1(address, parent);
+                write_to_file2(parent.address_of_children[k], child);
             } else {
                 int left_size = total_size / 2;
                 int right_size = total_size - left_size;
@@ -337,21 +328,16 @@ private:
                 }
                 child.size = left_size;
                 right_child.size = right_size;
-                File.seekp(address);
-                parent.write_to_file(File);
-                File.seekp(parent.address_of_children[k]);
-                child.write_to_file(File);
-                File.seekg(parent.address_of_children[k + 1]);
-                right_child.write_to_file(File);
+                write_to_file1(address, parent);
+                write_to_file2(parent.address_of_children[k], child);
+                write_to_file2(parent.address_of_children[k + 1], right_child);
                 return;
             }
         } else {
-            Node<T, M, L> child;
-            File.seekg(parent.address_of_children[k]);
-            child.read_from_file(File);
-            Node<T, M, L> right_child;
-            File.seekg(parent.address_of_children[k + 1]);
-            right_child.read_from_file(File);
+            Node child;
+            read_from_file1(parent.address_of_children[k], child);
+            Node right_child;
+            read_from_file1(parent.address_of_children[k + 1], right_child);
             int total_size = right_child.size + child.size;
             if (total_size < M - 1) {
                 child.key[child.size] = parent.key[k];
@@ -363,19 +349,15 @@ private:
                 child.size += right_child.size + 1;
                 for (int i = 0; i <= right_child.size; i++) {
                     if (right_child.is_leaf == 1) {
-                        File.seekg(right_child.address_of_children[i]);
-                        leaf_Node<T, V, M, L> tmp;
-                        tmp.read_from_file(File);
+                        leaf_Node tmp;
+                        read_from_file2(right_child.address_of_children[i], tmp);
                         tmp.address_of_parent = parent.address_of_children[k];
-                        File.seekp(right_child.address_of_children[i]);
-                        tmp.write_to_file(File);
+                        write_to_file2(right_child.address_of_children[i], tmp);
                     } else {
-                        File.seekg(right_child.address_of_children[i]);
-                        Node<T, M, L> tmp;
-                        tmp.read_from_file(File);
+                        Node tmp;
+                        read_from_file1(right_child.address_of_children[i], tmp);
                         tmp.address_of_parent = parent.address_of_children[k];
-                        File.seekp(right_child.address_of_children[i]);
-                        tmp.write_to_file(File);
+                        write_to_file1(right_child.address_of_children[i], tmp);
                     }
                 }
                 for (int i = k; i < parent.size - 1; i++) {
@@ -383,10 +365,8 @@ private:
                     parent.address_of_children[i + 1] = parent.address_of_children[i + 2];
                 }
                 parent.size--;
-                File.seekp(address);
-                parent.write_to_file(File);
-                File.seekp(parent.address_of_children[k]);
-                child.write_to_file(File);
+                write_to_file1(address, parent);
+                write_to_file1(parent.address_of_children[k], child);
             } else {
                 int left_size = total_size / 2;
                 int right_size = total_size - left_size;
@@ -400,19 +380,15 @@ private:
                     child.address_of_children[left_size] = right_child.address_of_children[left_size - child.size - 1];
                     for (int i = child.size + 1; i <= left_size; i++) {
                         if (child.is_leaf == 1) {
-                            File.seekg(child.address_of_children[i]);
-                            leaf_Node<T, V, M, L> tmp;
-                            tmp.read_from_file(File);
+                            leaf_Node tmp;
+                            read_from_file2(child.address_of_children[i], tmp);
                             tmp.address_of_parent = parent.address_of_children[k];
-                            File.seekp(child.address_of_children[i]);
-                            tmp.write_to_file(File);
+                            write_to_file2(child.address_of_children[i], tmp);
                         } else {
-                            File.seekg(child.address_of_children[i]);
-                            Node<T, M, L> tmp;
-                            tmp.read_from_file(File);
+                            Node tmp;
+                            read_from_file1(child.address_of_children[i], tmp);
                             tmp.address_of_parent = parent.address_of_children[k];
-                            File.seekp(child.address_of_children[i]);
-                            tmp.write_to_file(File);
+                            write_to_file1(child.address_of_children[i], tmp);
                         }
                     }
                     parent.key[k] = right_child.key[delta - 1];
@@ -436,38 +412,30 @@ private:
                     right_child.address_of_children[delta - 1] = child.address_of_children[left_size + delta];
                     for (int i = 0; i < delta; i++) {
                         if (right_child.is_leaf == 1) {
-                            File.seekg(right_child.address_of_children[i]);
-                            leaf_Node<T, V, M, L> tmp;
-                            tmp.read_from_file(File);
+                            leaf_Node tmp;
+                            read_from_file2(right_child.address_of_children[i], tmp);
                             tmp.address_of_parent = parent.address_of_children[k + 1];
-                            File.seekp(right_child.address_of_children[i]);
-                            tmp.write_to_file(File);
+                            write_to_file2(right_child.address_of_children[i], tmp);
                         } else {
-                            File.seekg(right_child.address_of_children[i]);
-                            Node<T, M, L> tmp;
-                            tmp.read_from_file(File);
+                            Node tmp;
+                            read_from_file1(right_child.address_of_children[i], tmp);
                             tmp.address_of_parent = parent.address_of_children[k + 1];
-                            File.seekp(right_child.address_of_children[i]);
-                            tmp.write_to_file(File);
+                            write_to_file1(right_child.address_of_children[i], tmp);
                         }
                     }
                     parent.key[k] = child.key[left_size];
                 }
                 child.size = left_size;
                 right_child.size = right_size;
-                File.seekp(address);
-                parent.write_to_file(File);
-                File.seekp(parent.address_of_children[k]);
-                child.write_to_file(File);
-                File.seekg(parent.address_of_children[k + 1]);
-                right_child.write_to_file(File);
+                write_to_file1(address, parent);
+                write_to_file1(parent.address_of_children[k], child);
+                write_to_file1(parent.address_of_children[k + 1], right_child);
                 return;
             }
         }
         if (parent.size < (M - 1) / 2 && address != address_of_root) {
-            Node<T, M, L> parent_parent;
-            File.seekg(parent.address_of_parent);
-            parent_parent.read_from_file(File);
+            Node parent_parent;
+            read_from_file1(parent.address_of_parent, parent_parent);
             int index;
             for (int i = 0; i <= parent_parent.size; i++) {
                 if (parent_parent.address_of_children[i] == address) {
@@ -478,9 +446,8 @@ private:
             long address_parent = parent.address_of_parent;
             merge_node(address_parent, index);
         } else if (parent.size == 0 && address == address_of_root) {
-            Node<T, M, L> root;
-            File.seekg(address_of_root);
-            root.read_from_file(File);
+            Node root;
+            read_from_file1(address_of_root, root);
             if (root.is_leaf == 1) {
                 return;
             }
@@ -488,19 +455,16 @@ private:
             if (address_of_root == -1) {
                 return;
             }
-            File.seekg(address_of_root);
-            Node<T, M, L> tmp;
-            tmp.read_from_file(File);
+            Node tmp;
+            read_from_file1(address_of_root, tmp);
             tmp.address_of_parent = -1;
-            File.seekp(address_of_root);
-            tmp.write_to_file(File);
+            write_to_file1(address_of_root, tmp);
             return;
         }
     }
     bool delete_the_node(long address, const T& value) {
-        File.seekg(address);
-        leaf_Node<T, V, M, L> node;
-        node.read_from_file(File);
+        leaf_Node node;
+        read_from_file2(address, node);
         int index = binary_find_value(node, value);
         if (index == -1 || !(node.key[index] == value)) {
             return false;
@@ -510,12 +474,10 @@ private:
             node.value[i] = node.value[i + 1];
         }
         node.size--;
-        File.seekp(address);
-        node.write_to_file(File);
+        write_to_file2(address, node);
         if (node.size < (L - 1) / 2) {
-            Node<T, M, L> parent_parent;
-            File.seekg(node.address_of_parent);
-            parent_parent.read_from_file(File);
+            Node parent_parent;
+            read_from_file1(node.address_of_parent, parent_parent);
             int index;
             for (int i = 0; i <= parent_parent.size; i++) {
                 if (parent_parent.address_of_children[i] == address) {
@@ -537,16 +499,14 @@ public:
             File.close();
             File.clear();
             File.open(file_name, std::ios::in | std::ios::out | std::ios::binary);
-            Node<T, M, L> initial;
+            Node initial;
             initial.is_leaf = 1;
-            leaf_Node<T, V, M, L> initial_leaf;
-            File.seekp(0);
-            initial.write_to_file(File);
+            leaf_Node initial_leaf;
+            write_to_file1(0, initial);
             initial.address_of_children[0] = File.tellp();
-            File.seekp(0);
-            initial.write_to_file(File);
+            write_to_file1(0, initial);
             initial_leaf.address_of_parent = 0;
-            initial_leaf.write_to_file(File);
+            write_to_file2(initial.address_of_children[0], initial_leaf);
         } else {
             long address_before;
             File.seekg(0, std::ios::end);
@@ -567,9 +527,8 @@ public:
     std::vector<std::pair<T, V>> find(const T& minimal, const T& maximal) {
         std::vector<std::pair<T, V>> values;
         long address = find_corresponding_leaf(minimal);
-        leaf_Node<T, V, M, L> node;
-        File.seekg(address);
-        node.read_from_file(File);
+        leaf_Node node;
+        read_from_file2(address, node);
         int index = 0;
         while (index < node.size && node.key[index] < minimal) {index++;}
         while (true) {
@@ -580,8 +539,7 @@ public:
             if (node.address_of_right_node == -1 || node.key[node.size - 1] > maximal) {
                 break;
             }
-            File.seekg(node.address_of_right_node);
-            node.read_from_file(File);
+            read_from_file2(node.address_of_right_node, node);
             index = 0;
         }
         return values;
@@ -643,7 +601,7 @@ public:
 int main() {
     int n;
     std::cin >> n;
-    B_plus_tree<key_value, key_value, 50, 50> bpt("File_for_bpt");
+    B_plus_tree<key_value, key_value, 3, 3> bpt("File_for_bpt");
     for (int i = 0; i < n; i++) {
         std::string operation;
         std::cin >> operation;
