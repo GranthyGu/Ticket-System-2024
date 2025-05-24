@@ -66,10 +66,12 @@ private:
         }
     };
     void write_to_file1(const long& pos, Node& node) {
-        if (!File) {return;}
+        if (LRU_node.get(pos, node)) {
+            return;
+        }
         File.seekp(pos);
+        if (!File) {return;}
         File.write(reinterpret_cast<char*> (&node), sizeof(Node));
-        LRU_node.put(pos, node);
     }
     void read_from_file1(const long& pos, Node& node) {
         if (LRU_node.get(pos, node)) {
@@ -80,10 +82,12 @@ private:
         File.read(reinterpret_cast<char*> (&node), sizeof(Node));
     }
     void write_to_file2(const long& pos, leaf_Node& node) {
-        if (!File) {return;}
+        if (LRU_leaf_node.get(pos, node)) {
+            return;
+        }
         File.seekp(pos);
+        if (!File) {return;}
         File.write(reinterpret_cast<char*> (&node), sizeof(leaf_Node));
-        LRU_leaf_node.put(pos, node);
     }
     void read_from_file2(const long& pos, leaf_Node& node) {
         if (LRU_leaf_node.get(pos, node)) {
@@ -601,7 +605,7 @@ public:
 int main() {
     int n;
     std::cin >> n;
-    B_plus_tree<key_value, char, 50, 50> bpt("File_for_bpt");
+    B_plus_tree<key_value, char, 3, 3> bpt("File_for_bpt");
     for (int i = 0; i < n; i++) {
         std::string operation;
         std::cin >> operation;
