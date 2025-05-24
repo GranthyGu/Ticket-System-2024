@@ -601,7 +601,7 @@ public:
 int main() {
     int n;
     std::cin >> n;
-    B_plus_tree<key_value, key_value, 50, 50> bpt("File_for_bpt");
+    B_plus_tree<key_value, char, 50, 50> bpt("File_for_bpt");
     for (int i = 0; i < n; i++) {
         std::string operation;
         std::cin >> operation;
@@ -610,7 +610,7 @@ int main() {
             int value;
             std::cin >> key >> value;
             key_value tmp(key, value);
-            bpt.insert(tmp, tmp);
+            bpt.insert(tmp, '0');
         }
         if (operation == "delete") {
             std::string key;
@@ -624,7 +624,7 @@ int main() {
             std::cin >> key;
             key_value minimal(key, INT_MIN);
             key_value maximal(key, INT_MAX);
-            std::vector<std::pair<key_value, key_value>> tmp = bpt.find(minimal, maximal);
+            std::vector<std::pair<key_value, char>> tmp = bpt.find(minimal, maximal);
             if (tmp.size() == 0) {
                 std::cout << "null" << std::endl;
             } else {
