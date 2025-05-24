@@ -2,8 +2,8 @@
 #ifndef LRC_HPP
 #define LRC_HPP
 
-#include "vector/unordered_map.hpp"
-#include "vector/list.hpp"
+#include "STL/unordered_map.hpp"
+#include "STL/list.hpp"
 #include <utility>
 #include <fstream>
 #include <cstddef>
@@ -18,8 +18,9 @@ private:
     sjtu::unordered_map<long, ListIterator> cache;
     std::fstream File;
 public:
-    explicit LRU(std::size_t cap = 2000, std::fstream& File) : capacity(cap), File(File) {}
-    ~LRU() {
+    explicit LRU(std::size_t cap = 2000) : capacity(cap) {}
+    void set_file(const std::string& str) {File.open(str, std::ios::in | std::ios::out | std::ios::binary);}
+    void put_info() {
         while (!lru_list.empty()) {
             auto last = lru_list.back();
             File.seekp(last.first);
