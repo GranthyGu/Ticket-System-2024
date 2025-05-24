@@ -18,7 +18,7 @@ private:
     sjtu::unordered_map<long, ListIterator> cache;
     std::fstream File;
 public:
-    explicit LRU(std::size_t cap = 2000) : capacity(cap) {}
+    explicit LRU(std::size_t cap = 20000) : capacity(cap) {}
     void set_file(const std::string& str) {File.open(str, std::ios::in | std::ios::out | std::ios::binary);}
     void put_info() {
         while (!lru_list.empty()) {

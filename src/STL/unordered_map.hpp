@@ -21,7 +21,7 @@ private:
         return (size_t)key % bucket_count;
     }
 public:
-    unordered_map(size_t bucket_count = 50) 
+    unordered_map(size_t bucket_count = 20000) 
         : bucket_count(bucket_count), size_(0) {
         buckets = new Node*[bucket_count]();
     }
