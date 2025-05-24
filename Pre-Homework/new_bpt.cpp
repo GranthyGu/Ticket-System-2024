@@ -13,8 +13,8 @@ private:
     std::string file_name;
     std::fstream File;
     long address_of_root;
-    LRU<long, Node> LRU_node;
-    LRU<long, leaf_Node> LRU_leaf_node;
+    LRU<Node> LRU_node;
+    LRU<leaf_Node> LRU_leaf_node;
     class Node {
     public:
         int is_leaf;
@@ -503,6 +503,8 @@ public:
             File.close();
             File.clear();
             File.open(file_name, std::ios::in | std::ios::out | std::ios::binary);
+            LRU_node.set_file(str);
+            LRU_leaf_node.set_file(str);
             Node initial;
             initial.is_leaf = 1;
             leaf_Node initial_leaf;
@@ -512,6 +514,8 @@ public:
             initial_leaf.address_of_parent = 0;
             write_to_file2(initial.address_of_children[0], initial_leaf);
         } else {
+            LRU_node.set_file(str);
+            LRU_leaf_node.set_file(str);
             long address_before;
             File.seekg(0, std::ios::end);
             long final_pos = File.tellg();
@@ -549,6 +553,8 @@ public:
         return values;
     }
     void put_root() {
+        LRU_node.put_info();
+        LRU_leaf_node.put_info();
         File.seekp(0, std::ios::end);
         File.write(reinterpret_cast<char*> (&address_of_root), sizeof(long));
         return;
