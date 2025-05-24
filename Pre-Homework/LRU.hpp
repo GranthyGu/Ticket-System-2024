@@ -36,6 +36,13 @@ public:
         ListIterator* it = cache.find(key);
         if (it == nullptr) return false;
         lru_list.splice(lru_list.begin(), *it);
+        (*it)->second = value;
+        return true;
+    }
+    bool get_(const long& key, Value& value) {
+        ListIterator* it = cache.find(key);
+        if (it == nullptr) return false;
+        lru_list.splice(lru_list.begin(), *it);
         value = (*it)->second;
         return true;
     }

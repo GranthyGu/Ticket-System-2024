@@ -18,7 +18,7 @@ private:
     sjtu::unordered_map<long, ListIterator> cache;
     std::fstream File;
 public:
-    explicit LRU(std::size_t cap = 20000) : capacity(cap) {}
+    explicit LRU(std::size_t cap = 2000) : capacity(cap) {}
     void set_file(const std::string& str) {File.open(str, std::ios::in | std::ios::out | std::ios::binary);}
     void put_info() {
         while (!lru_list.empty()) {
@@ -33,6 +33,13 @@ public:
         return cache.find(key) != nullptr;
     }
     bool get(const long& key, Value& value) {
+        ListIterator* it = cache.find(key);
+        if (it == nullptr) return false;
+        lru_list.splice(lru_list.begin(), *it);
+        (*it)->second = value;
+        return true;
+    }
+    bool get_(const long& key, Value& value) {
         ListIterator* it = cache.find(key);
         if (it == nullptr) return false;
         lru_list.splice(lru_list.begin(), *it);
