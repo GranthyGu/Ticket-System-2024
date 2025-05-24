@@ -86,11 +86,7 @@ bool station::operator==(const station& other) const {
     return id == other.id;
 }
 
-information::information() {
-    for (int i = 0; i < 100; i++) {
-        prices[i] = 0;
-    }
-}
+information::information() {}
 information::information(const std::string& num, const std::string& type_, const std::string& stations_,
                          const std::string& sale_date, const std::string& price) {
     station_num = std::stoi(num);
@@ -185,14 +181,7 @@ void information::read_from_file(std::fstream& File, long pos) {
 }
 
 
-train_information::train_information() {
-    released = 0;
-    for (int i = 0; i < 100; i++) {
-        for (int j = 0; j < 92; j++) {
-            seat_num[i][j] = 0;
-        }
-    }
-}
+train_information::train_information() {}
 train_information::train_information(const std::string& str1, const std::string& str2, const std::string& str3, const std::string& str4) {
     int num = std::stoi(str1);
     seat_num_initial = num;

@@ -2,11 +2,7 @@
 
 #include "account_management.hpp"
 
-username::username() {
-    for (int i = 0; i < 20; i++) {
-        username_[i] = '\0';
-    }
-}
+username::username() {}
 username::username(const std::string& str) {
     for (int i = 0; i < str.size(); i++) {
         username_[i] = str[i];
@@ -33,11 +29,7 @@ bool username::operator==(const username& other) const {
     return strcmp(username_, other.username_) == 0;
 }
 
-password::password() {
-    for (int i = 0; i < 30; i++) {
-        password_[i] = '\0';
-    }
-}
+password::password() {}
 password::password(const std::string& str) {
     for (int i = 0; i < str.size(); i++) {
         password_[i] = str[i];
@@ -55,11 +47,7 @@ password& password::operator=(const password& other) {
     return *this;
 }
 
-name::name() {
-    for (int i = 0; i < 20; i++) {
-        name_[i] = '\0';
-    }
-}
+name::name() {}
 name::name(const std::string& str) {
     for (int i = 0; i < str.size(); i++) {
         name_[i] = str[i];
@@ -77,11 +65,7 @@ name& name::operator=(const name& other) {
     return *this;
 }
 
-mail_address::mail_address() {
-    for (int i = 0; i < 30; i++) {
-        mail_address_[i] = '\0';
-    }
-}
+mail_address::mail_address() {}
 mail_address::mail_address(const std::string& str) {
     for (int i = 0; i < str.size(); i++) {
         mail_address_[i] = str[i];
