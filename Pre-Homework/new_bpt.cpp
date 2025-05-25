@@ -66,9 +66,9 @@ private:
         }
     };
     void write_to_file1(const long pos, Node& node) {
-        // if (LRU_node.get(pos, node)) {
-        //     return;
-        // }
+        if (LRU_node.get(pos, node)) {
+            return;
+        }
         File.seekp(pos);
         if (!File) {return;}
         File.write(reinterpret_cast<char*> (&node), sizeof(Node));
@@ -84,9 +84,9 @@ private:
         LRU_node.put(pos, node);
     }
     void write_to_file2(const long pos, leaf_Node& node) {
-        // if (LRU_leaf_node.get(pos, node)) {
-        //     return;
-        // }
+        if (LRU_leaf_node.get(pos, node)) {
+            return;
+        }
         File.seekp(pos);
         if (!File) {return;}
         File.write(reinterpret_cast<char*> (&node), sizeof(leaf_Node));
@@ -516,8 +516,8 @@ public:
             File.close();
             File.clear();
             File.open(file_name, std::ios::in | std::ios::out | std::ios::binary);
-            // LRU_node.set_file(str);
-            // LRU_leaf_node.set_file(str);
+            LRU_node.set_file(str);
+            LRU_leaf_node.set_file(str);
             LRU_node.clear();
             LRU_leaf_node.clear();
             File.seekp(0);
@@ -531,8 +531,8 @@ public:
             initial_leaf.address_of_parent = 10;
             write_to_file2(initial.address_of_children[0], initial_leaf);
         } else {
-            // LRU_node.set_file(str);
-            // LRU_leaf_node.set_file(str);
+            LRU_node.set_file(str);
+            LRU_leaf_node.set_file(str);
             LRU_node.clear();
             LRU_leaf_node.clear();
             long address_before;
@@ -574,8 +574,8 @@ public:
         return values;
     }
     void put_root() {
-        // LRU_node.put_info();
-        // LRU_leaf_node.put_info();
+        LRU_node.put_info();
+        LRU_leaf_node.put_info();
         LRU_node.clear();
         LRU_leaf_node.clear();
         File.seekp(0);
