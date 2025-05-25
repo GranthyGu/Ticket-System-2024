@@ -634,7 +634,7 @@ public:
 int main() {
     int n;
     std::cin >> n;
-    B_plus_tree<key_value, char, 3, 3> bpt("File_for_bpt");
+    B_plus_tree<key_value, char, 45, 45> bpt("File_for_bpt");
     for (int i = 0; i < n; i++) {
         std::string operation;
         std::cin >> operation;
