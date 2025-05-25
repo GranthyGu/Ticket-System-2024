@@ -20,6 +20,10 @@ private:
 public:
     explicit LRU(std::size_t cap = 2000) : capacity(cap) {}
     void set_file(const std::string& str) {File.open(str, std::ios::in | std::ios::out | std::ios::binary);}
+    ~LRU() {
+        put_info();
+        clear();
+    }
     void put_info() {
         while (!lru_list.empty()) {
             auto last = lru_list.back();
@@ -53,7 +57,7 @@ public:
             list_it->second = value; 
             lru_list.splice(lru_list.begin(), *it);
         } else {
-            if (lru_list.size() == capacity) {
+            if (lru_list.size() >= capacity) {
                 auto last = lru_list.back();
                 File.seekp(last.first);
                 File.write(reinterpret_cast<char*>(&last.second), sizeof(Value));
