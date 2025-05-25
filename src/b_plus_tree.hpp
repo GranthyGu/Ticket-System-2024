@@ -99,7 +99,7 @@ private:
         File.seekp(pos);
         if (!File) {return;}
         File.write(reinterpret_cast<char*> (&node), sizeof(Node));
-        // LRU_node.put(pos, node);
+        LRU_node.put(pos, node);
     }
     void read_from_file1(const long pos, Node& node) {
         if (LRU_node.get_(pos, node)) {
@@ -108,7 +108,7 @@ private:
         File.seekg(pos);
         if (!File) {return;}
         File.read(reinterpret_cast<char*> (&node), sizeof(Node));
-        // LRU_node.put(pos, node);
+        LRU_node.put(pos, node);
     }
     void write_to_file2(const long pos, leaf_Node& node) {
         // if (LRU_leaf_node.get(pos, node)) {
@@ -117,7 +117,7 @@ private:
         File.seekp(pos);
         if (!File) {return;}
         File.write(reinterpret_cast<char*> (&node), sizeof(leaf_Node));
-        // LRU_leaf_node.put(pos, node);
+        LRU_leaf_node.put(pos, node);
     }
     void read_from_file2(const long pos, leaf_Node& node) {
         if (LRU_leaf_node.get_(pos, node)) {
@@ -126,7 +126,7 @@ private:
         File.seekg(pos);
         if (!File) {return;}
         File.read(reinterpret_cast<char*> (&node), sizeof(leaf_Node));
-        // LRU_leaf_node.put(pos, node);
+        LRU_leaf_node.put(pos, node);
     }
     // To find the index in node.key, which is the first element less than target. If not exist, return -1.
     int binary_find(Node node, T target) {
@@ -586,10 +586,10 @@ public:
             File.close();
             File.clear();
             File.open(file_name, std::ios::in | std::ios::out | std::ios::binary);
-            // LRU_node.set_file(str);
-            // LRU_leaf_node.set_file(str);
-            // LRU_node.clear();
-            // LRU_leaf_node.clear();
+            LRU_node.set_file(str);
+            LRU_leaf_node.set_file(str);
+            LRU_node.clear();
+            LRU_leaf_node.clear();
             File.seekp(0);
             File.write(reinterpret_cast<char*> (&address_of_root), sizeof(long));
             Node initial;
@@ -601,10 +601,10 @@ public:
             initial_leaf.address_of_parent = 13;
             write_to_file2(initial.address_of_children[0], initial_leaf);
         } else {
-            // LRU_node.set_file(str);
-            // LRU_leaf_node.set_file(str);
-            // LRU_node.clear();
-            // LRU_leaf_node.clear();
+            LRU_node.set_file(str);
+            LRU_leaf_node.set_file(str);
+            LRU_node.clear();
+            LRU_leaf_node.clear();
             long address_before;
             int size_before;
             File.seekg(0);
@@ -656,10 +656,10 @@ public:
     }
     int size() {return size_;}
     void put_root() {
-        // LRU_node.put_info();
-        // LRU_leaf_node.put_info();
-        // LRU_node.clear();
-        // LRU_leaf_node.clear();
+        LRU_node.put_info();
+        LRU_leaf_node.put_info();
+        LRU_node.clear();
+        LRU_leaf_node.clear();
         File.seekp(0);
         File.write(reinterpret_cast<char*> (&address_of_root), sizeof(long));
         File.seekp(8);

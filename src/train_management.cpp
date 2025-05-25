@@ -534,52 +534,6 @@ sjtu::vector<temp> train_management::query_ticket_(const std::string& start, con
     }
     return train_satisfied;
 }
-sjtu::vector<std::pair<temp, int> > train_management::query_ticket__(const std::string& start, const std::string& end, const date& date_, const Time& time_) {
-    std::string min_id, max_id;
-    for (int i = 0; i < 20; i++) {
-        min_id += '\0';
-        max_id += '~';
-    }
-    Time t;
-    station minimal_start(start, min_id, t, t), maximal_start(start, max_id, t, t);
-    station minimal_end(end, min_id, t, t), maximal_end(end, max_id, t, t);
-    sjtu::vector<std::pair<station, std::pair<int, int> > > start_train = released_station_train_id_list.find(minimal_start, maximal_start);
-    sjtu::vector<std::pair<station, std::pair<int, int> > > end_train = released_station_train_id_list.find(minimal_end, maximal_end);
-    sjtu::vector<std::pair<temp, int> > train_satisfied;
-    for (int i = 0; i < start_train.size(); i++) {
-        station train = start_train[i].first;
-        for (int j = 0; j < end_train.size(); j++) {
-            station train_end = end_train[j].first;
-            if (train_end.id == train.id) {
-                if (train_end.time_arrival > train.time_arrival) {
-                    date d(date_);
-                    d.minus_day(train.time_leave.day);
-                    sjtu::vector<std::pair<train_id, long> > v_ = basic_information.find(train.id, train.id);
-                    information info;
-                    info.read_from_file(File_, v_[0].second);
-                    if (info.sale_date_end < d || (info.sale_date_end == d && (train.time_leave.hour < time_.hour || (train.time_leave.hour == time_.hour && train.time_leave.minute < time_.minute)))) {
-                        break;
-                    }
-                    int price = end_train[j].second.second - start_train[i].second.second;
-                    int t = train_end.time_arrival - train.time_leave;
-                    int index_begin = start_train[i].second.first;
-                    int index_end = end_train[j].second.first;
-                    int day_ = 0;
-                    if (info.sale_date_begin > d) {
-                        day_ = info.sale_date_begin.delta_day() - d.delta_day();
-                    } else {
-                        if ((train.time_leave.hour < time_.hour || (train.time_leave.hour == time_.hour && train.time_leave.minute < time_.minute))) {
-                            day_ = 1;
-                        }
-                    }
-                    train_satisfied.push_back({{train, train_end, t, price, index_begin, index_end}, day_});
-                }
-                break;
-            }
-        }
-    }
-    return train_satisfied;
-}
 void train_management::query_ticket(const token_scanner& ts) {
     std::string start, end, date_, sort_;
     for (int i = 0; i < ts.key_argument.size(); i++) {
