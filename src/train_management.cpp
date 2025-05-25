@@ -519,6 +519,9 @@ sjtu::vector<temp> train_management::query_ticket_(const std::string& start, con
             satisfy.push_back({ii, jj});
             ii++;
             jj++;
+        } else {
+            ii++;
+            jj++;
         }
     }
     for (auto k : satisfy) {
