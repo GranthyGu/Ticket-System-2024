@@ -12,7 +12,7 @@ private:
     class leaf_Node;
     std::string file_name;
     std::fstream File;
-    long address_of_root = 0;
+    long address_of_root = 10;
     LRU<Node> LRU_node;
     LRU<leaf_Node> LRU_leaf_node;
     class Node {
@@ -72,16 +72,16 @@ private:
         File.seekp(pos);
         if (!File) {return;}
         File.write(reinterpret_cast<char*> (&node), sizeof(Node));
-        LRU_node.put(pos, node);
+        // LRU_node.put(pos, node);
     }
     void read_from_file1(const long& pos, Node& node) {
-        if (LRU_node.get_(pos, node)) {
-            return;
-        }
+        // if (LRU_node.get_(pos, node)) {
+        //     return;
+        // }
         File.seekg(pos);
         if (!File) {return;}
         File.read(reinterpret_cast<char*> (&node), sizeof(Node));
-        LRU_node.put(pos, node);
+        // LRU_node.put(pos, node);
     }
     void write_to_file2(const long& pos, leaf_Node& node) {
         // if (LRU_leaf_node.get(pos, node)) {
@@ -90,16 +90,16 @@ private:
         File.seekp(pos);
         if (!File) {return;}
         File.write(reinterpret_cast<char*> (&node), sizeof(leaf_Node));
-        LRU_leaf_node.put(pos, node);
+        // LRU_leaf_node.put(pos, node);
     }
     void read_from_file2(const long& pos, leaf_Node& node) {
-        if (LRU_leaf_node.get_(pos, node)) {
-            return;
-        }
+        // if (LRU_leaf_node.get_(pos, node)) {
+        //     return;
+        // }
         File.seekg(pos);
         if (!File) {return;}
         File.read(reinterpret_cast<char*> (&node), sizeof(leaf_Node));
-        LRU_leaf_node.put(pos, node);
+        // LRU_leaf_node.put(pos, node);
     }
     // To find the index in node.key, which is the first element less than target. If not exist, return -1.
     int binary_find(Node node, T target) {
@@ -156,6 +156,8 @@ private:
                 long root_address = File.tellp();
                 write_to_file1(root_address, new_root);
                 address_of_root = root_address;
+                File.seekp(0);
+                File.write(reinterpret_cast<char*> (&address_of_root), sizeof(long));
                 parent.address_of_parent = root_address;
                 write_to_file1(address, parent);
                 split_node(root_address, 0);
@@ -271,6 +273,7 @@ private:
         Node node;
         long address = address_of_root;
         read_from_file1(address_of_root, node);
+        bool c = true;
         while (true) {
             int index = binary_find(node, value);
             address = node.address_of_children[index + 1];
@@ -464,6 +467,8 @@ private:
                 return;
             }
             address_of_root = parent.address_of_children[0];
+            File.seekp(0);
+            File.write(reinterpret_cast<char*> (&address_of_root), sizeof(long));
             if (address_of_root == -1) {
                 return;
             }
@@ -503,7 +508,7 @@ private:
         return true;
     }
 public:
-    B_plus_tree(std::string str) : file_name(str), address_of_root(0) {
+    B_plus_tree(std::string str) : file_name(str), address_of_root(10) {
         File.open(file_name, std::ios::in | std::ios::out | std::ios::binary);
         if (!File) {
             File.clear();
@@ -515,13 +520,15 @@ public:
             // LRU_leaf_node.set_file(str);
             LRU_node.clear();
             LRU_leaf_node.clear();
+            File.seekp(0);
+            File.write(reinterpret_cast<char*> (&address_of_root), sizeof(long));
             Node initial;
             initial.is_leaf = 1;
             leaf_Node initial_leaf;
-            write_to_file1(0, initial);
+            write_to_file1(10, initial);
             initial.address_of_children[0] = File.tellp();
-            write_to_file1(0, initial);
-            initial_leaf.address_of_parent = 0;
+            write_to_file1(10, initial);
+            initial_leaf.address_of_parent = 10;
             write_to_file2(initial.address_of_children[0], initial_leaf);
         } else {
             // LRU_node.set_file(str);
@@ -531,7 +538,7 @@ public:
             long address_before;
             File.seekg(0, std::ios::end);
             long final_pos = File.tellg();
-            File.seekg(final_pos - sizeof(long));
+            File.seekg(0);
             File.read(reinterpret_cast<char*> (&address_before), sizeof(long));
             address_of_root = address_before;
         }
@@ -569,7 +576,7 @@ public:
         // LRU_leaf_node.put_info();
         LRU_node.clear();
         LRU_leaf_node.clear();
-        File.seekp(0, std::ios::end);
+        File.seekp(0);
         File.write(reinterpret_cast<char*> (&address_of_root), sizeof(long));
         return;
     }
@@ -625,7 +632,7 @@ public:
 int main() {
     int n;
     std::cin >> n;
-    B_plus_tree<key_value, char, 45, 45> bpt("File_for_bpt");
+    B_plus_tree<key_value, char, 3, 3> bpt("File_for_bpt");
     for (int i = 0; i < n; i++) {
         std::string operation;
         std::cin >> operation;
