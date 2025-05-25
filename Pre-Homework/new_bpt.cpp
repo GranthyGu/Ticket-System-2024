@@ -13,8 +13,8 @@ private:
     std::string file_name;
     std::fstream File;
     long address_of_root = 10;
-    LRU<long, Node> LRU_node;
-    LRU<long, leaf_Node> LRU_leaf_node;
+    LRU<Node> LRU_node;
+    LRU<leaf_Node> LRU_leaf_node;
     class Node {
     public:
         int is_leaf;
@@ -540,6 +540,9 @@ public:
             File.read(reinterpret_cast<char*> (&address_before), sizeof(long));
             address_of_root = address_before;
         }
+    }
+    ~B_plus_tree() {
+        put_root();
     }
     bool insert(const T& key, const V& value) {
         long address = find_corresponding_leaf(key);

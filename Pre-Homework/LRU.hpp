@@ -1,171 +1,91 @@
-//
-// Created by JaneZ on 2025/4/21.
-//
-#ifndef LRUCACHE_H
-#define LRUCACHE_H
+// LRU.hpp
+#ifndef LRC_HPP
+#define LRC_HPP
 
+#include "vector/unordered_map.hpp"
 #include "vector/list.hpp"
+#include <utility>
+#include <fstream>
+#include <cstddef>
 
-template<class KEY,class OTHER>
+template<typename Value>
 class LRU {
 private:
-    struct CacheEntry {
-        KEY key;
-        OTHER value;
-
-        CacheEntry(const KEY& k,const OTHER& other):key(k),value(other){}
-    };
-    list<CacheEntry> cacheList; //用于维护访问先后顺序
-
-    struct HashMapNode {
-        KEY key;
-        typename list<CacheEntry>::Node* list_node;
-        HashMapNode* next;
-
-        HashMapNode(const KEY&k,typename list<CacheEntry>::Node* p = nullptr,HashMapNode* n = nullptr):key(k),list_node(p),next(n){}
-    };
-
-    class HashTable {
-    private:
-        static const size_t HashTableSize = 20000;
-        HashMapNode* table[HashTableSize];
-
-        size_t HASH(const KEY&k) {
-            return static_cast<size_t>(k) % HashTableSize;
-        }
-    public:
-        HashTable() {
-            for(size_t i = 0;i < HashTableSize;i ++) {
-                table[i] = nullptr;
-            }
-        }
-        ~HashTable() {
-            clear();
-        }
-
-        void insert(const KEY& key,typename list<CacheEntry>::Node* node) {
-            size_t h = HASH(key);
-            HashMapNode* new_node = new HashMapNode(key,node);
-            new_node->next = table[h];
-            table[h] = new_node;
-        }
-
-        typename list<CacheEntry>::Node* find(const KEY& k) {
-            size_t h = HASH(k);
-            HashMapNode* current = table[h];
-            while(current) {
-                if(current->key == k) {
-                    return current->list_node;
-                }
-                current = current->next;
-            }
-            return nullptr;
-        }
-
-        void erase(const KEY& k) {
-            size_t h = HASH(k);
-            HashMapNode* current = table[h];
-            HashMapNode* prev = nullptr;
-
-            while(current) {
-                if(current->key == k) {
-                    if(prev) {
-                        prev->next = current->next;
-                    }else {
-                        table[h] = current->next;
-                    }
-                    delete current;
-                    return;
-                }
-                prev = current;
-                current = current->next;
-            }
-        }
-
-        void clear() {
-            for(size_t i = 0;i < HashTableSize;i ++) {
-                HashMapNode* current = table[i];
-                while(current) {
-                    HashMapNode* tmp = current;
-                    current = current->next;
-                    delete tmp;
-                }
-                table[i] = nullptr;
-            }
-        }
-    };
-
-    HashTable unordered_map;
-    size_t capacity;
-
-    void move_to_front(typename list<CacheEntry>::Node* node) {
-        if (!node || cacheList.empty() || node == cacheList.begin().get_node()) {
-            return;
-        }
-        cacheList.splice(cacheList.begin(), cacheList, typename list<CacheEntry>::iterator(node));
-    }
-
+    using Node = std::pair<long, Value>;
+    using ListIterator = typename sjtu::list<Node>::iterator;
+    std::size_t capacity;
+    sjtu::list<Node> lru_list;
+    sjtu::unordered_map<long, ListIterator> cache;
+    std::fstream File;
 public:
-    LRU(size_t Capacity = 200):capacity(Capacity){}
-
+    explicit LRU(std::size_t cap = 5) : capacity(cap) {}
+    void set_file(const std::string& str) {File.open(str, std::ios::in | std::ios::out | std::ios::binary);}
     ~LRU() {
+        // put_info();
         clear();
     }
-
-    bool get_(const KEY& k,OTHER& other) {
-        auto node = unordered_map.find(k);
-        if(!node) {
-            return false;
+    void put_info() {
+        while (!lru_list.empty()) {
+            auto last = lru_list.back();
+            File.seekp(last.first);
+            File.write(reinterpret_cast<char*>(&last.second), sizeof(Value));
+            cache.erase(last.first);
+            lru_list.pop_back();
         }
-        other = node->data.value;
-        move_to_front(node);
+    }
+    bool contains(const long& key) const {
+        return cache.find(key) != nullptr;
+    }
+    bool get(const long& key, Value& value) {
+        ListIterator* it = cache.find(key);
+        if (it == nullptr) return false;
+        lru_list.splice(lru_list.begin(), *it);
+        (*it)->second = value;
         return true;
     }
-
-    void put(const KEY& k,const OTHER& value) {
-        auto node = unordered_map.find(k);
-
-        //本来就存在
-        if(node) {
-            node->data.value = value;
-            move_to_front(node);
-            return;
-        }
-
-        if(cacheList.size() >= capacity) {
-            //std::cout << "Full Full Full Full Full Full JaneZ!" << '\n';
-            auto last = cacheList.back();
-            unordered_map.erase(last.key);
-            cacheList.pop_back();
-        }
-
-        cacheList.push_front(CacheEntry(k,value));
-        unordered_map.insert(k,cacheList.begin().get_node());
+    bool get_(const long& key, Value& value) {
+        ListIterator* it = cache.find(key);
+        if (it == nullptr) return false;
+        lru_list.splice(lru_list.begin(), *it);
+        value = (*it)->second;
+        return true;
     }
-
-    void erase(const KEY& k) {
-        auto node = unordered_map.find(k);
-        if(!node) {
-            return;
+    void put(const long& key, const Value& value) {
+        ListIterator* it = cache.find(key);
+        if (it != nullptr) {
+            auto list_it = *it;
+            list_it->second = value; 
+            lru_list.splice(lru_list.begin(), *it);
+        } else {
+            if (lru_list.size() >= capacity) {
+                auto last = lru_list.back();
+                // File.seekp(last.first);
+                // File.write(reinterpret_cast<char*>(&last.second), sizeof(Value));
+                cache.erase(last.first);
+                lru_list.pop_back();
+            }
+            Node temp = {key, value};
+            lru_list.push_front(temp);
+            cache.insert(key, lru_list.begin());
         }
-        auto it = typename list<CacheEntry>::iterator(node);
-        cacheList.erase(it);
-        unordered_map.erase(k);
-
     }
-
+    bool erase(const long& key) {
+        ListIterator* it = cache.find(key);
+        if (it == nullptr) return false;
+        lru_list.erase(*it);
+        cache.erase(key);
+        return true;
+    }
     void clear() {
-        unordered_map.clear();
-        cacheList.clear();
+        cache.clear();
+        lru_list.clear();
     }
-
-    size_t size() {
-        return cacheList.size();
+    std::size_t size() const {
+        return cache.size();
     }
-
-    size_t getCapacity() {
+    std::size_t max_size() const {
         return capacity;
     }
 };
 
-#endif //LRUCACHE_H
+#endif // LRC_HPP
