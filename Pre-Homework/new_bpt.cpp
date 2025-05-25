@@ -509,6 +509,8 @@ public:
             File.open(file_name, std::ios::in | std::ios::out | std::ios::binary);
             // LRU_node.set_file(str);
             // LRU_leaf_node.set_file(str);
+            LRU_node.clear();
+            LRU_leaf_node.clear();
             Node initial;
             initial.is_leaf = 1;
             leaf_Node initial_leaf;
@@ -520,6 +522,8 @@ public:
         } else {
             // LRU_node.set_file(str);
             // LRU_leaf_node.set_file(str);
+            LRU_node.clear();
+            LRU_leaf_node.clear();
             long address_before;
             File.seekg(0, std::ios::end);
             long final_pos = File.tellg();
@@ -559,6 +563,8 @@ public:
     void put_root() {
         // LRU_node.put_info();
         // LRU_leaf_node.put_info();
+        LRU_node.clear();
+        LRU_leaf_node.clear();
         File.seekp(0, std::ios::end);
         File.write(reinterpret_cast<char*> (&address_of_root), sizeof(long));
         return;
