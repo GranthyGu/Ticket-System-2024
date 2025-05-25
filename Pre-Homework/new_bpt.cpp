@@ -273,7 +273,6 @@ private:
         Node node;
         long address = address_of_root;
         read_from_file1(address_of_root, node);
-        bool c = true;
         while (true) {
             int index = binary_find(node, value);
             address = node.address_of_children[index + 1];
@@ -559,7 +558,6 @@ public:
         read_from_file2(address, node);
         int index = 0;
         while (index < node.size && node.key[index] < minimal) {index++;}
-        int i = 0;
         while (true) {
             while (index < node.size && (node.key[index] < maximal || node.key[index] == maximal)) {
                 values.push_back({node.key[index], '0'});

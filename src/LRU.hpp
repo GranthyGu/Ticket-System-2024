@@ -20,6 +20,10 @@ private:
 public:
     explicit LRU(std::size_t cap = 500) : capacity(cap) {}
     void set_file(const std::string& str) {File.open(str, std::ios::in | std::ios::out | std::ios::binary);}
+    ~LRU() {
+        put_info();
+        clear();
+    }
     void put_info() {
         while (!lru_list.empty()) {
             auto last = lru_list.back();
