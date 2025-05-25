@@ -13,8 +13,8 @@ private:
     std::string file_name;
     std::fstream File;
     long address_of_root = 10;
-    LRU<Node> LRU_node;
-    LRU<leaf_Node> LRU_leaf_node;
+    LRU<long, Node> LRU_node;
+    LRU<long, leaf_Node> LRU_leaf_node;
     class Node {
     public:
         int is_leaf;
@@ -65,41 +65,41 @@ private:
             return *this;
         }
     };
-    void write_to_file1(const long& pos, Node& node) {
+    void write_to_file1(const long pos, Node& node) {
         // if (LRU_node.get(pos, node)) {
         //     return;
         // }
         File.seekp(pos);
         if (!File) {return;}
         File.write(reinterpret_cast<char*> (&node), sizeof(Node));
-        // LRU_node.put(pos, node);
+        LRU_node.put(pos, node);
     }
-    void read_from_file1(const long& pos, Node& node) {
-        // if (LRU_node.get_(pos, node)) {
-        //     return;
-        // }
+    void read_from_file1(const long pos, Node& node) {
+        if (LRU_node.get_(pos, node)) {
+            return;
+        }
         File.seekg(pos);
         if (!File) {return;}
         File.read(reinterpret_cast<char*> (&node), sizeof(Node));
-        // LRU_node.put(pos, node);
+        LRU_node.put(pos, node);
     }
-    void write_to_file2(const long& pos, leaf_Node& node) {
+    void write_to_file2(const long pos, leaf_Node& node) {
         // if (LRU_leaf_node.get(pos, node)) {
         //     return;
         // }
         File.seekp(pos);
         if (!File) {return;}
         File.write(reinterpret_cast<char*> (&node), sizeof(leaf_Node));
-        // LRU_leaf_node.put(pos, node);
+        LRU_leaf_node.put(pos, node);
     }
-    void read_from_file2(const long& pos, leaf_Node& node) {
-        // if (LRU_leaf_node.get_(pos, node)) {
-        //     return;
-        // }
+    void read_from_file2(const long pos, leaf_Node& node) {
+        if (LRU_leaf_node.get_(pos, node)) {
+            return;
+        }
         File.seekg(pos);
         if (!File) {return;}
         File.read(reinterpret_cast<char*> (&node), sizeof(leaf_Node));
-        // LRU_leaf_node.put(pos, node);
+        LRU_leaf_node.put(pos, node);
     }
     // To find the index in node.key, which is the first element less than target. If not exist, return -1.
     int binary_find(Node node, T target) {
@@ -536,8 +536,6 @@ public:
             LRU_node.clear();
             LRU_leaf_node.clear();
             long address_before;
-            File.seekg(0, std::ios::end);
-            long final_pos = File.tellg();
             File.seekg(0);
             File.read(reinterpret_cast<char*> (&address_before), sizeof(long));
             address_of_root = address_before;
@@ -558,6 +556,7 @@ public:
         read_from_file2(address, node);
         int index = 0;
         while (index < node.size && node.key[index] < minimal) {index++;}
+        int i = 0;
         while (true) {
             while (index < node.size && (node.key[index] < maximal || node.key[index] == maximal)) {
                 values.push_back({node.key[index], '0'});
