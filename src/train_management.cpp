@@ -137,10 +137,10 @@ information::information(const information& other) {
     type = other.type;
     sale_date_begin = other.sale_date_begin;
     sale_date_end = other.sale_date_end;
-    for (int i = 0; i < 100; i++) {
+    for (int i = 0; i < 31; i++) {
         prices[i] = other.prices[i];
     }
-    for (int i = 0; i < 100; i++) {
+    for (int i = 0; i < 30; i++) {
         for (int j = 0; j < 30; j++) {
             stations[i][j] = other.stations[i][j];
         }
@@ -151,10 +151,10 @@ information& information::operator=(const information& other) {
     type = other.type;
     sale_date_begin = other.sale_date_begin;
     sale_date_end = other.sale_date_end;
-    for (int i = 0; i < 100; i++) {
+    for (int i = 0; i < 30; i++) {
         prices[i] = other.prices[i];
     }
-    for (int i = 0; i < 100; i++) {
+    for (int i = 0; i < 30; i++) {
         for (int j = 0; j < 30; j++) {
             stations[i][j] = other.stations[i][j];
         }
@@ -185,7 +185,7 @@ train_information::train_information() {}
 train_information::train_information(const std::string& str1, const std::string& str2, const std::string& str3, const std::string& str4) {
     int num = std::stoi(str1);
     seat_num_initial = num;
-    for (int i = 0; i < 100; i++) {
+    for (int i = 0; i < 30; i++) {
         for (int j = 0; j < 92; j++) {
             seat_num[i][j] = num;
         }
@@ -227,7 +227,7 @@ train_information::train_information(const std::string& str1, const std::string&
     arriving_time[arrive.size()] = start;
 }
 train_information::train_information(const train_information& other) {
-    for (int i = 0; i < 100; i++) {
+    for (int i = 0; i < 30; i++) {
         for (int j = 0; j < 92; j++) {
             seat_num[i][j] = other.seat_num[i][j];
         }
@@ -239,7 +239,7 @@ train_information::train_information(const train_information& other) {
     released = other.released;
 }
 train_information& train_information::operator=(const train_information& other) {
-    for (int i = 0; i < 100; i++) {
+    for (int i = 0; i < 30; i++) {
         for (int j = 0; j < 92; j++) {
             seat_num[i][j] = other.seat_num[i][j];
         }

@@ -27,10 +27,10 @@ class information {
 public:
     int station_num = 0;
     char type = 0;
-    char stations[100][30] = {0};
+    char stations[30][30] = {0};
     date sale_date_begin;
     date sale_date_end;
-    int prices[101] = {0};    // prefix_sum
+    int prices[31] = {0};    // prefix_sum
     information();
     information(const information&);
     information(const std::string&, const std::string&, const std::string&, const std::string&, const std::string&);
@@ -44,10 +44,10 @@ class train_information{
 public:
     int seat_num_initial = 0;
     int released = 0;
-    int seat_num[100][92];
+    int seat_num[30][92];
     Time start_time;
-    Time arriving_time[101];   // arriving_time[i] saves the time to the ith station.
-    Time leaving_time[101];    // leaving_time[i] saves the time leave the ith station.
+    Time arriving_time[31];   // arriving_time[i] saves the time to the ith station.
+    Time leaving_time[31];    // leaving_time[i] saves the time leave the ith station.
     train_information();
     train_information(const std::string&, const std::string&, const std::string&, const std::string&);
     train_information(const train_information&);
@@ -82,8 +82,8 @@ struct temp {
 
 class train_management {
 private:
-    B_plus_tree<train_id, long, 120, 100> basic_information;
-    B_plus_tree<train_id, long, 120, 100> advanced_information;
+    B_plus_tree<train_id, long, 140, 100> basic_information;
+    B_plus_tree<train_id, long, 140, 100> advanced_information;
     B_plus_tree<station, std::pair<int, int>, 40, 40> released_station_train_id_list;
     sjtu::vector<temp> query_ticket_(const std::string&, const std::string&, const date&);
     sjtu::vector<std::pair<temp, int>> query_ticket__(const std::string&, const std::string&, const date&, const Time&);
