@@ -508,29 +508,36 @@ sjtu::vector<temp> train_management::query_ticket_(const std::string& start, con
     sjtu::vector<std::pair<station, std::pair<int, int> > > start_train = released_station_train_id_list.find(minimal_start, maximal_start);
     sjtu::vector<std::pair<station, std::pair<int, int> > > end_train = released_station_train_id_list.find(minimal_end, maximal_end);
     sjtu::vector<temp> train_satisfied;
-    for (int i = 0; i < start_train.size(); i++) {
-        station train = start_train[i].first;
-        for (int j = 0; j < end_train.size(); j++) {
-            station train_end = end_train[j].first;
-            if (train_end.id == train.id) {
-                if (train_end.time_arrival > train.time_arrival) {
-                    date d(date_);
-                    d.minus_day(train.time_leave.day);
-                    sjtu::vector<std::pair<train_id, long> > v_ = basic_information.find(train.id, train.id);
-                    information info;
-                    info.read_from_file(File_, v_[0].second);
-                    if (info.sale_date_begin > d || info.sale_date_end < d) {
-                        break;
-                    }
-                    int price = end_train[j].second.second - start_train[i].second.second;
-                    int t = train_end.time_arrival - train.time_leave;
-                    int index_begin = start_train[i].second.first;
-                    int index_end = end_train[j].second.first;
-                    train_satisfied.push_back({train, train_end, t, price, index_begin, index_end});
-                }
-                break;
-            }
+    int ii = 0, jj = 0;
+    sjtu::vector<std::pair<int, int>> satisfy;
+    while (ii < start_train.size() && jj < end_train.size()) {
+        if (start_train[ii].first.id < end_train[jj].first.id) {
+            ii++;
+        } else if (start_train[ii].first.id > end_train[jj].first.id) {
+            jj++;
+        } else if (start_train[ii].second.first < end_train[jj].second.first) {
+            satisfy.push_back({ii, jj});
+            ii++;
+            jj++;
         }
+    }
+    for (auto k : satisfy) {
+        int i = k.first, j = k.second;
+        station train = start_train[i].first;
+        station train_end = end_train[j].first;
+        date d(date_);
+        d.minus_day(train.time_leave.day);
+        sjtu::vector<std::pair<train_id, long> > v_ = basic_information.find(train.id, train.id);
+        information info;
+        info.read_from_file(File_, v_[0].second);
+        if (info.sale_date_begin > d || info.sale_date_end < d) {
+            continue;
+        }
+        int price = end_train[j].second.second - start_train[i].second.second;
+        int t = train_end.time_arrival - train.time_leave;
+        int index_begin = start_train[i].second.first;
+        int index_end = end_train[j].second.first;
+        train_satisfied.push_back({train, train_end, t, price, index_begin, index_end});
     }
     return train_satisfied;
 }
