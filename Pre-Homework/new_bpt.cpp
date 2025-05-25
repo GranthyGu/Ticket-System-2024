@@ -293,6 +293,7 @@ private:
             read_from_file2(parent.address_of_children[k], child);
             leaf_Node right_child;
             read_from_file2(parent.address_of_children[k + 1], right_child);
+            long ad = parent.address_of_children[k + 1];
             int total_size = right_child.size + child.size;
             if (total_size <= L - 1) {
                 for (int i = 0; i < right_child.size; i++) {
@@ -308,6 +309,7 @@ private:
                 parent.size--;
                 write_to_file1(address, parent);
                 write_to_file2(parent.address_of_children[k], child);
+                LRU_leaf_node.erase(ad);
             } else {
                 int left_size = total_size / 2;
                 int right_size = total_size - left_size;
@@ -346,6 +348,7 @@ private:
             read_from_file1(parent.address_of_children[k], child);
             Node right_child;
             read_from_file1(parent.address_of_children[k + 1], right_child);
+            long ad = parent.address_of_children[k + 1];
             int total_size = right_child.size + child.size;
             if (total_size < M - 1) {
                 child.key[child.size] = parent.key[k];
@@ -375,6 +378,7 @@ private:
                 parent.size--;
                 write_to_file1(address, parent);
                 write_to_file1(parent.address_of_children[k], child);
+                LRU_node.erase(ad);
             } else {
                 int left_size = total_size / 2;
                 int right_size = total_size - left_size;
