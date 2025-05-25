@@ -658,7 +658,9 @@ void train_management::query_transfer(const token_scanner& ts) {
         max_id += '~';
     }
     station minimal_start(start, min_id, Time(), Time()), maximal_start(start, max_id, Time(), Time());
+    station minimal_end(end, min_id, Time(), Time()), maximal_end(end, max_id, Time(), Time());
     sjtu::vector<std::pair<station, std::pair<int, int> > > start_train = released_station_train_id_list.find(minimal_start, maximal_start);
+    sjtu::vector<std::pair<station, std::pair<int, int> > > end_train = released_station_train_id_list.find(minimal_end, maximal_end);
     for (auto i : start_train) {
         sjtu::vector<std::pair<train_id, long>> temp_ = basic_information.find(i.first.id, i.first.id);
         train_information info_;
@@ -672,24 +674,46 @@ void train_management::query_transfer(const token_scanner& ts) {
         if (initial_date < info_t.sale_date_begin || initial_date > info_t.sale_date_end){
             continue;
         }
-        for (int j = index + 1; j < info.size(); j++) {
-            std::string station_info = info[j];
-            date cur_date = d;
-            cur_date.minus_day(info_.leaving_time[index].day);
-            cur_date.add_day(info_.arriving_time[j].day);
-            Time t = info_.arriving_time[j];
-            sjtu::vector<std::pair<temp, int> > end_train = query_ticket__(station_info, end, cur_date, t);
-            for (auto k : end_train) {
-                if (k.first.begin.id == i.first.id) {
-                    continue;
+        for (auto j : end_train) {
+            if (j.first.id == i.first.id) {
+                continue;
+            }
+            train_information info_end;
+            info_end.read_from_file(File, advanced_information.find(j.first.id, j.first.id)[0].second);
+            information info_t_end;
+            info_t_end.read_from_file(File_, basic_information.find(j.first.id, j.first.id)[0].second);
+            sjtu::vector<std::string> in_ = info_t_end.get_stations();
+            for (int k = j.second.first - 1; k >= 0; k--) {
+                for (int l = i.second.first + 1; l < info_t.station_num; l++) {
+                    if (info[l] == in_[k]) {
+                        Time arr = info_.arriving_time[l];
+                        Time lea = info_end.leaving_time[k];
+                        date ddd = initial_date;
+                        ddd.add_day(arr.day);
+                        ddd.minus_day(lea.day);
+                        if (info_t_end.sale_date_end < ddd || (info_t_end.sale_date_end == ddd && (lea.hour < arr.hour || (lea.hour == arr.hour && lea.minute < arr.minute)))) {
+                            continue;
+                        }
+                        int day_ = 0;
+                        if (info_t_end.sale_date_begin > ddd) {
+                            day_ = info_t_end.sale_date_begin.delta_day() - ddd.delta_day();
+                        } else {
+                            if ((lea.hour < arr.hour || (lea.hour == arr.hour && lea.minute < arr.minute))) {
+                                day_ = 1;
+                            }
+                        }
+                        station end1(info[l], i.first.id, arr, info_.leaving_time[l]);
+                        station start2(in_[k], j.first.id, info_end.arriving_time[k], lea);
+                        temp fir = {i.first, end1, arr - i.first.time_leave, info_t.prices[l] - info_t.prices[i.second.first], i.second.first, l};
+                        temp en = {start2, j.first, j.first.time_arrival - lea, j.second.second - info_t_end.prices[k], k, j.second.first};
+                        train_satisfied.push_back({{fir, en}, day_});
+                    } else {
+                        continue;
+                    }
                 }
-                station first_end(station_info, i.first.id, info_.arriving_time[j], info_.leaving_time[j]);
-                int time_tmp = info_.arriving_time[j] - info_.leaving_time[index];
-                int price_ = info_t.prices[j] - info_t.prices[index];
-                temp tt = {i.first, first_end, time_tmp, price_, index, j};
-                train_satisfied.push_back({{tt, k.first}, k.second});
             }
         }
+        
     }
     if (train_satisfied.size() == 0) {
         std::cout << '[' << ts.time << ']' << ' ' << 0 << std::endl;
