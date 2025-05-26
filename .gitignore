@@ -1,13 +1,15 @@
-# 忽略 build 目录及其所有内容
 build/
 
-# 忽略 testcases 目录及其所有内容
-testcases/
+.vscode/
 
 run-test.sh
 
 bonus.md
 
-.vscode/
-
 management_system.md
+
+**/.vscode
+
+**/.DS_Store
+
+.DS_Store
