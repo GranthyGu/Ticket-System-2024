@@ -1,85 +1,111 @@
-# 火车票管理系统
+# 🚄 Train Ticket Management System
 
-SJTU CS1951 课程大作业
+This project is a fully-featured train ticket management system written in C++. It supports ticket booking, refunding, order queries, train schedule management, and user account functionalities. All data is persistently stored on disk, and the system uses custom-built STL-like containers and a generic B+ tree for indexing.
 
-## 概况
+---
 
-### 作业安排
+## 📁 Project Structure
 
+```text
+src/
+├── STL/                           # Custom STL-like containers (no use of standard STL)
+│   ├── list.hpp
+│   ├── map.hpp
+│   ├── unordered_map.hpp
+│   ├── vector.hpp
+│   └── priority_queue.hpp
+├── b_plus_tree.hpp                # Generic B+ tree with file storage support
+├── LRU.hpp                        # LRU cache for B+ tree node buffering
+├── ticket_management.hpp/cpp     # Core module for ticket operations
+├── train_management.hpp/cpp      # Train management module
+├── account_management.hpp/cpp     # User account system
+├── time_calculator.hpp/cpp       # Utilities for time and date processing
+├── token_scanner.hpp/cpp         # Command-line token parser
+└── main.cpp                       # Program entry point
+```
+---
 
-本作业分为两个部分。
+## 🎯 Main Features
 
-在第一部分中，需要实现一个基于文件的 B+ 树。
+- **User System:**
+  - Register / Login / Logout
+  - Query / Modify personal information
 
-在第二部分中，需要实现一个火车票管理系统。此部分要求使用 Git 开发，维持良好的项目管理习惯。此部分的中期检查等检查方式均会通过查看登记的 Git 仓库链接，因此如果想更换仓库的链接请及时联系助教。
+- **Train Management:**
+  - Add / Delete / Release train schedules
+  - Query train schedule and route
 
-### 作业周期
+- **Ticket System:**
+  - Query tickets (supports direct and transfer connections)
+  - Buy tickets / Refund tickets / Handle waiting list
+  - View personal orders
 
-**注意：管理系统的截止日期 (2024-06-02 第 15 周周日) 为作业的硬性截止日期，除非有极其特殊的原因，否则不接受任何在截止后的提交，所有代码均以截止前的提交为准！**
+- **Admin Operations:**
+  - Clear all system data
+  - Manage other users (requires admin privileges)
 
-- B+ 树: 2024-04-14（第 8 周周日）~ 2024-05-12（第 12 周周日）
-- 管理系统: 2024-05-12（第 12 周周日）~ 2024-06-02（第 15 周周日）
+---
 
-## 评分标准
+## ⚙️ Technical Highlights
 
-本作业占本课程总成绩 15%，其中 B+ 树占 7%，管理系统占 8%。
+- **No STL Usage:** All containers like `vector`, `map`, `unordered_map`, `list` are implemented manually.
+- **Persistent Storage:** All data is saved to disk files and survives program termination.
+- **Generic B+ Tree:** High-performance key-value indexing supporting range queries and disk-based storage.
+- **LRU Cache:** Caching layer to reduce disk I/O during B+ tree operations.
+- **Command Parser:** `token_scanner` handles user command-line input parsing, ensuring consistent parameter handling.
+- **Time Utility:** `time_calculator` supports time arithmetic, formatting, and conversion between strings and internal representations.
 
-- B+ 树: 7%
-  - OJ 测试: 80%
-  - Code Review: 20%
-- 管理系统: 8%
-  - 正确性测试: 50%
-    - 在正确性测试中，每一个测试点都有一个相对宽松的时间和磁盘使用限制，以仅检验程序的正确性和鲁棒性，只要通过测试即可得到满分。因此请不要尝试针对特定情况进行有损正确性和鲁棒性的优化。
-  - 压力测试 - 30%
-    - 在压力测试中，每一个测试点会有两档时间和磁盘限制，通过所有 Easy 的测试可以得到 (60% * 30% =) 18% 的分数，通过所有 Hard 测试可以得到另外 (40% * 30% =)  12% 的分数。
-  - Code Review: 20%
+---
 
-bonus 另外计算，计入平时分总分，且不超过总分的 1%。
+## 📌 Core Interfaces
 
-## B+ 树 - 7%
+The `ticket_management` class includes the following key functions:
 
-### 作业要求
+| Method | Description |
+|--------|-------------|
+| `buy_ticket` | Allows a logged-in user to purchase a ticket for a released train. Handles seat availability and waiting list. |
+| `query_order` | Returns a list of the user's current and pending orders. |
+| `refund_ticket` | Processes ticket refunds and updates the waiting list if necessary. |
+| `exit` | Terminates the program. |
+| `clear` | Clears all system data (admin/debug use only). |
+| `add_train` | Adds a new train schedule with route and seat info. |
+| `delete_train` | Deletes a non-released train schedule. |
+| `release_train` | Publishes a train, making it available for booking. |
+| `query_train` | Displays the full schedule and station info for a train. |
+| `query_ticket` | Shows available direct trains between two cities on a specific date. |
+| `query_transfer` | Suggests optimal routes that require one transfer between trains. |
+| `add_user` | Creates a new user account. Can be used by admin to add users with privileges. |
+| `log_in` | Authenticates and logs in a user. |
+| `log_out` | Logs out the current user. |
+| `query_profile` | Queries user profile info (self or others with sufficient privileges). |
+| `modify_profile` | Updates user profile information. |
 
-作业要求实现基于 BPT 的外存管理系统。在本作业中，只允许调用以下头文件中的函数和类：
+---
 
-iostream, string, cstdio, cmath, string, fstream, filesystem
+## 🧰 Utility Components
 
-不允许使用这些头文件包含的 STL 容器 (如 `std::vector`) 或算法 (如 `std::sort`)。唯一的例外是，你可以使用 `std::string`。如果需要用到其他与算法、数据结构无关的标准库，请向助教提出请求。
+### `token_scanner`
 
-你需要在最后通过 [OJ 测试](https://acm.sjtu.edu.cn/OnlineJudge/problem/2186)。
+A lightweight parser for tokenizing command-line input. It splits input strings into tokens by whitespace or delimiters, and supports:
 
-注意：建议使用类模板以方便后续完成管理系统。
+- `next_token()` – Retrieve the next token
+- `has_more_tokens()` – Check if more tokens are available
+- `reset(input)` – Reset the parser with new input
 
-## 管理系统 - 8%
+It is used by all major subsystems to standardize how input parameters are parsed.
 
-见 [管理系统文档](management_system.md)。
+### `time_calculator`
 
-数据压缩包下发在群里。
+A utility for handling dates and times, including:
 
-### 负责助教
-李心瑶 金嘉禾 王鲲鹏
+- Time and date arithmetic (e.g., add minutes to a time)
+- Parsing strings into date/time objects
+- Comparing and formatting times
 
+Used extensively in train scheduling and ticket date validation.
 
-## Bonus
+---
 
-见 [Bonus 文档](bonus.md)。
+## 🧣 Acknowlegements
 
-准备自行设计并实现其他 bonus 的同学可以联系助教协商。
-
-## 扣分
-
-请保证自己项目结构的可读性，可以包括优化项目结构、完善 README 的内容、适当的文件树指南等，晦涩难懂的项目可能会加大助教的工作量，也可能会影响你的成绩（B+ 树阶段此条可忽略）。
-
-**如有出现任何抄袭现象按 0 分计，并按照违反学术诚信的操作办法处理。**
-请保证自己项目结构的可读性，可以包括优化项目结构、完善 README 的内容、适当的文件树指南等，晦涩难懂的项目可能会加大助教的工作量，也可能会影响你的成绩（B+ 树阶段此条可忽略）。
-
-**如有出现任何抄袭现象按 0 分计，并按照违反学术诚信的操作办法处理。**
-
-### 中期检查
-
-由于火车票后端设计难度较大，请同学们 **务必** 在设计好清晰的文件结构以及代码框架后再动手。
-为了督促同学们的完成进度，我们将在 **5月26日（星期天）** 进行一次中期检查，检查内容包含：
-- 仓库代码，要求建好各模块的文件，设计好基本的类（包含数据成员）以及几个基本的函数接口（要求有函数签名）
-- 口头回答对 `query_transfer` 的设计
-中期检查效果不理想的同学可能会被扣除5%以内的分数。
-  
+Monkey_Lee, JaneZ, Istina, TAs.
