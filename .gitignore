@@ -1,0 +1,15 @@
+build/
+
+.vscode/
+
+run-test.sh
+
+bonus.md
+
+management_system.md
+
+**/.vscode
+
+**/.DS_Store
+
+.DS_Store
