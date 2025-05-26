@@ -4,8 +4,10 @@ build/
 # 忽略 testcases 目录及其所有内容
 testcases/
 
-code
 run-test.sh
 
 bonus.md
 
+.vscode/
+
+management_system.md
