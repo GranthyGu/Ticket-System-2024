@@ -1,6 +1,6 @@
-// LRU.hpp
-#ifndef LRC_HPP
-#define LRC_HPP
+// Created by GranthyGu on 2025/5/25
+#ifndef LRU_HPP
+#define LRU_HPP
 
 #include "STL/unordered_map.hpp"
 #include "STL/list.hpp"
@@ -88,4 +88,4 @@ public:
     }
 };
 
-#endif // LRC_HPP
+#endif // LRU_HPP

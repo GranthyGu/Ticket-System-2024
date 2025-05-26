@@ -93,9 +93,6 @@ private:
         }
     };
     void write_to_file1(const long pos, Node& node) {
-        // if (LRU_node.get(pos, node)) {
-        //     return;
-        // }
         File.seekp(pos);
         if (!File) {return;}
         File.write(reinterpret_cast<char*> (&node), sizeof(Node));
@@ -111,9 +108,6 @@ private:
         LRU_node.put(pos, node);
     }
     void write_to_file2(const long pos, leaf_Node& node) {
-        // if (LRU_leaf_node.get(pos, node)) {
-        //     return;
-        // }
         File.seekp(pos);
         if (!File) {return;}
         File.write(reinterpret_cast<char*> (&node), sizeof(leaf_Node));

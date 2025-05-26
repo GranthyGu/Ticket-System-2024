@@ -4,8 +4,6 @@
 #pragma GCC optimize ("Ofast")
 
 int main() {
-    // freopen("in.txt", "r", stdin);   // 读入in.dat文件作为输入 
-	// freopen("out.dat", "w", stdout);  // 将输入写入out.dat文件中 
     ticket_management ticket;
     while (true) {
         std::string order;
