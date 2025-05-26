@@ -106,6 +106,6 @@ Used extensively in train scheduling and ticket date validation.
 
 ---
 
-## 🧣 Acknowlegements
+## 🧣 Acknowledgements
 
 Monkey_Lee, JaneZ, Istina, TAs.
